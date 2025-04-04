@@ -16,6 +16,15 @@ import JobsPage from "./pages/company/Jobs";
 import CompliancePage from "./pages/company/Compliance";
 import NotFound from "./pages/NotFound";
 
+// Employee Routes
+import EmployeeDashboard from "./pages/employee/Dashboard";
+import EmployeeAttendancePage from "./pages/employee/Attendance";
+import EmployeePayslipsPage from "./pages/employee/Payslips";
+import EmployeeLeavesPage from "./pages/employee/Leaves";
+import EmployeePerformancePage from "./pages/employee/Performance";
+import EmployeeAnnouncementsPage from "./pages/employee/Announcements";
+import EmployeeProfilePage from "./pages/employee/Profile";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -39,6 +48,15 @@ const App = () => (
           <Route path="/company/leaves" element={<LeavesPage />} />
           <Route path="/company/jobs" element={<JobsPage />} />
           <Route path="/company/compliance" element={<CompliancePage />} />
+          
+          {/* Employee Routes */}
+          <Route path="/employee" element={<EmployeeDashboard />} />
+          <Route path="/employee/attendance" element={<EmployeeAttendancePage />} />
+          <Route path="/employee/payslips" element={<EmployeePayslipsPage />} />
+          <Route path="/employee/leaves" element={<EmployeeLeavesPage />} />
+          <Route path="/employee/performance" element={<EmployeePerformancePage />} />
+          <Route path="/employee/announcements" element={<EmployeeAnnouncementsPage />} />
+          <Route path="/employee/profile" element={<EmployeeProfilePage />} />
           
           {/* Catch-all Route */}
           <Route path="*" element={<NotFound />} />
