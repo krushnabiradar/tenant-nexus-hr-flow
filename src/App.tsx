@@ -25,6 +25,14 @@ import EmployeePerformancePage from "./pages/employee/Performance";
 import EmployeeAnnouncementsPage from "./pages/employee/Announcements";
 import EmployeeProfilePage from "./pages/employee/Profile";
 
+// Manager Routes
+import ManagerDashboard from "./pages/manager/Dashboard";
+import TeamPage from "./pages/manager/Team";
+import LeaveRequestsPage from "./pages/manager/LeaveRequests";
+import ManagerPerformancePage from "./pages/manager/Performance";
+import TasksPage from "./pages/manager/Tasks";
+import ManagerAnnouncementsPage from "./pages/manager/Announcements";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -57,6 +65,14 @@ const App = () => (
           <Route path="/employee/performance" element={<EmployeePerformancePage />} />
           <Route path="/employee/announcements" element={<EmployeeAnnouncementsPage />} />
           <Route path="/employee/profile" element={<EmployeeProfilePage />} />
+          
+          {/* Manager Routes */}
+          <Route path="/manager" element={<ManagerDashboard />} />
+          <Route path="/manager/team" element={<TeamPage />} />
+          <Route path="/manager/leave-requests" element={<LeaveRequestsPage />} />
+          <Route path="/manager/performance" element={<ManagerPerformancePage />} />
+          <Route path="/manager/tasks" element={<TasksPage />} />
+          <Route path="/manager/announcements" element={<ManagerAnnouncementsPage />} />
           
           {/* Catch-all Route */}
           <Route path="*" element={<NotFound />} />
