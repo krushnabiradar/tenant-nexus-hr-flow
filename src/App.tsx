@@ -14,7 +14,6 @@ import PayrollPage from "./pages/company/Payroll";
 import LeavesPage from "./pages/company/Leaves";
 import JobsPage from "./pages/company/Jobs";
 import CompliancePage from "./pages/company/Compliance";
-import NotFound from "./pages/NotFound";
 
 // Employee Routes
 import EmployeeDashboard from "./pages/employee/Dashboard";
@@ -32,6 +31,16 @@ import LeaveRequestsPage from "./pages/manager/LeaveRequests";
 import ManagerPerformancePage from "./pages/manager/Performance";
 import TasksPage from "./pages/manager/Tasks";
 import ManagerAnnouncementsPage from "./pages/manager/Announcements";
+
+// Finance Routes
+import FinanceDashboard from "./pages/finance/Dashboard";
+import FinancePayrollPage from "./pages/finance/Payroll";
+import TaxesPage from "./pages/finance/Taxes";
+import ReimbursementsPage from "./pages/finance/Reimbursements";
+import ReportsPage from "./pages/finance/Reports";
+import AnalyticsPage from "./pages/finance/Analytics";
+
+import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
@@ -73,6 +82,14 @@ const App = () => (
           <Route path="/manager/performance" element={<ManagerPerformancePage />} />
           <Route path="/manager/tasks" element={<TasksPage />} />
           <Route path="/manager/announcements" element={<ManagerAnnouncementsPage />} />
+          
+          {/* Finance Routes */}
+          <Route path="/finance" element={<FinanceDashboard />} />
+          <Route path="/finance/payroll" element={<FinancePayrollPage />} />
+          <Route path="/finance/taxes" element={<TaxesPage />} />
+          <Route path="/finance/reimbursements" element={<ReimbursementsPage />} />
+          <Route path="/finance/reports" element={<ReportsPage />} />
+          <Route path="/finance/analytics" element={<AnalyticsPage />} />
           
           {/* Catch-all Route */}
           <Route path="*" element={<NotFound />} />
