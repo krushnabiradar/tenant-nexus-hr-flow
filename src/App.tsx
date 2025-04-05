@@ -8,7 +8,7 @@ import Landing from "./pages/Landing";
 import AdminDashboard from "./pages/admin/Dashboard";
 import CompaniesPage from "./pages/admin/Companies";
 import UsersPage from "./pages/admin/Users";
-import AnalyticsPage from "./pages/admin/Analytics";
+import AdminAnalyticsPage from "./pages/admin/Analytics";
 import BillingPage from "./pages/admin/Billing";
 import SecurityPage from "./pages/admin/Security";
 import SettingsPage from "./pages/admin/Settings";
@@ -43,7 +43,7 @@ import FinancePayrollPage from "./pages/finance/Payroll";
 import TaxesPage from "./pages/finance/Taxes";
 import ReimbursementsPage from "./pages/finance/Reimbursements";
 import ReportsPage from "./pages/finance/Reports";
-import AnalyticsPage from "./pages/finance/Analytics";
+import FinanceAnalyticsPage from "./pages/finance/Analytics";
 
 // IT & Compliance Routes
 import ComplianceDashboard from "./pages/compliance/Dashboard";
@@ -82,7 +82,7 @@ const App = () => (
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/companies" element={<CompaniesPage />} />
           <Route path="/admin/users" element={<UsersPage />} />
-          <Route path="/admin/analytics" element={<AnalyticsPage />} />
+          <Route path="/admin/analytics" element={<AdminAnalyticsPage />} />
           <Route path="/admin/billing" element={<BillingPage />} />
           <Route path="/admin/security" element={<SecurityPage />} />
           <Route path="/admin/settings" element={<SettingsPage />} />
@@ -119,7 +119,7 @@ const App = () => (
           <Route path="/finance/taxes" element={<TaxesPage />} />
           <Route path="/finance/reimbursements" element={<ReimbursementsPage />} />
           <Route path="/finance/reports" element={<ReportsPage />} />
-          <Route path="/finance/analytics" element={<AnalyticsPage />} />
+          <Route path="/finance/analytics" element={<FinanceAnalyticsPage />} />
           
           {/* IT & Compliance Routes */}
           <Route path="/compliance" element={<ComplianceDashboard />} />

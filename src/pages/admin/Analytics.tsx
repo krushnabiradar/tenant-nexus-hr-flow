@@ -3,7 +3,7 @@ import DashboardLayout from "@/layouts/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart3 } from "lucide-react";
 
-const AnalyticsPage = () => {
+const AdminAnalyticsPage = () => {
   return (
     <DashboardLayout>
       <div className="space-y-6">
@@ -31,4 +31,4 @@ const AnalyticsPage = () => {
   );
 };
 
-export default AnalyticsPage;
+export default AdminAnalyticsPage;
