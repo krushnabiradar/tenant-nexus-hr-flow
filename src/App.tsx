@@ -7,6 +7,11 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Landing from "./pages/Landing";
 import AdminDashboard from "./pages/admin/Dashboard";
 import CompaniesPage from "./pages/admin/Companies";
+import UsersPage from "./pages/admin/Users";
+import AnalyticsPage from "./pages/admin/Analytics";
+import BillingPage from "./pages/admin/Billing";
+import SecurityPage from "./pages/admin/Security";
+import SettingsPage from "./pages/admin/Settings";
 import CompanyDashboard from "./pages/company/Dashboard";
 import EmployeesPage from "./pages/company/Employees";
 import AttendancePage from "./pages/company/Attendance";
@@ -76,6 +81,11 @@ const App = () => (
           {/* Admin Routes */}
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/companies" element={<CompaniesPage />} />
+          <Route path="/admin/users" element={<UsersPage />} />
+          <Route path="/admin/analytics" element={<AnalyticsPage />} />
+          <Route path="/admin/billing" element={<BillingPage />} />
+          <Route path="/admin/security" element={<SecurityPage />} />
+          <Route path="/admin/settings" element={<SettingsPage />} />
           
           {/* Company Routes */}
           <Route path="/company" element={<CompanyDashboard />} />

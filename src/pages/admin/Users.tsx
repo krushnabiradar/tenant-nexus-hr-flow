@@ -3,7 +3,7 @@ import DashboardLayout from "@/layouts/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users } from "lucide-react";
 
-const UserManagementPage = () => {
+const UsersPage = () => {
   return (
     <DashboardLayout>
       <div className="space-y-6">
@@ -31,4 +31,4 @@ const UserManagementPage = () => {
   );
 };
 
-export default UserManagementPage;
+export default UsersPage;
