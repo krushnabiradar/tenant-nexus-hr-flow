@@ -40,6 +40,16 @@ import ReimbursementsPage from "./pages/finance/Reimbursements";
 import ReportsPage from "./pages/finance/Reports";
 import AnalyticsPage from "./pages/finance/Analytics";
 
+// IT & Compliance Routes
+import ComplianceDashboard from "./pages/compliance/Dashboard";
+import SecurityLogsPage from "./pages/compliance/SecurityLogs";
+import UserAccessPage from "./pages/compliance/UserAccess";
+import ComplianceReportsPage from "./pages/compliance/Reports";
+import AuditLogsPage from "./pages/compliance/AuditLogs";
+import DataManagementPage from "./pages/compliance/DataManagement";
+import ActivityMonitorPage from "./pages/compliance/Activity";
+import ComplianceSettingsPage from "./pages/compliance/Settings";
+
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -90,6 +100,16 @@ const App = () => (
           <Route path="/finance/reimbursements" element={<ReimbursementsPage />} />
           <Route path="/finance/reports" element={<ReportsPage />} />
           <Route path="/finance/analytics" element={<AnalyticsPage />} />
+          
+          {/* IT & Compliance Routes */}
+          <Route path="/compliance" element={<ComplianceDashboard />} />
+          <Route path="/compliance/security-logs" element={<SecurityLogsPage />} />
+          <Route path="/compliance/user-access" element={<UserAccessPage />} />
+          <Route path="/compliance/reports" element={<ComplianceReportsPage />} />
+          <Route path="/compliance/audit-logs" element={<AuditLogsPage />} />
+          <Route path="/compliance/data-management" element={<DataManagementPage />} />
+          <Route path="/compliance/activity" element={<ActivityMonitorPage />} />
+          <Route path="/compliance/settings" element={<ComplianceSettingsPage />} />
           
           {/* Catch-all Route */}
           <Route path="*" element={<NotFound />} />
