@@ -1,0 +1,153 @@
+
+version: '3.8'
+
+services:
+  # MongoDB
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - hrms-network
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=password123
+
+  # API Gateway
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    restart: always
+    ports:
+      - "3000:3000"
+    depends_on:
+      - auth-service
+      - tenant-service
+      - employee-service
+      - attendance-service
+      - payroll-service
+      - leave-service
+    networks:
+      - hrms-network
+    environment:
+      - PORT=3000
+      - JWT_SECRET=your_jwt_secret_key_here
+
+  # Auth Service
+  auth-service:
+    build: ./auth-service
+    container_name: auth-service
+    restart: always
+    ports:
+      - "3001:3001"
+    depends_on:
+      - mongodb
+    networks:
+      - hrms-network
+    environment:
+      - PORT=3001
+      - MONGODB_URI=mongodb://admin:password123@mongodb:27017/hrms_auth?authSource=admin
+      - JWT_SECRET=your_jwt_secret_key_here
+
+  # Tenant Service
+  tenant-service:
+    build: ./tenant-service
+    container_name: tenant-service
+    restart: always
+    ports:
+      - "3002:3002"
+    depends_on:
+      - mongodb
+      - auth-service
+    networks:
+      - hrms-network
+    environment:
+      - PORT=3002
+      - MONGODB_URI=mongodb://admin:password123@mongodb:27017/hrms_tenant?authSource=admin
+      - JWT_SECRET=your_jwt_secret_key_here
+      - AUTH_SERVICE_URL=http://auth-service:3001
+
+  # Employee Service
+  employee-service:
+    build: ./employee-service
+    container_name: employee-service
+    restart: always
+    ports:
+      - "3003:3003"
+    depends_on:
+      - mongodb
+      - auth-service
+      - tenant-service
+    networks:
+      - hrms-network
+    environment:
+      - PORT=3003
+      - MONGODB_URI=mongodb://admin:password123@mongodb:27017/hrms_employee?authSource=admin
+      - JWT_SECRET=your_jwt_secret_key_here
+      - AUTH_SERVICE_URL=http://auth-service:3001
+      - TENANT_SERVICE_URL=http://tenant-service:3002
+
+  # Attendance Service
+  attendance-service:
+    build: ./attendance-service
+    container_name: attendance-service
+    restart: always
+    ports:
+      - "3004:3004"
+    depends_on:
+      - mongodb
+      - employee-service
+    networks:
+      - hrms-network
+    environment:
+      - PORT=3004
+      - MONGODB_URI=mongodb://admin:password123@mongodb:27017/hrms_attendance?authSource=admin
+      - JWT_SECRET=your_jwt_secret_key_here
+      - EMPLOYEE_SERVICE_URL=http://employee-service:3003
+
+  # Payroll Service
+  payroll-service:
+    build: ./payroll-service
+    container_name: payroll-service
+    restart: always
+    ports:
+      - "3005:3005"
+    depends_on:
+      - mongodb
+      - employee-service
+    networks:
+      - hrms-network
+    environment:
+      - PORT=3005
+      - MONGODB_URI=mongodb://admin:password123@mongodb:27017/hrms_payroll?authSource=admin
+      - JWT_SECRET=your_jwt_secret_key_here
+      - EMPLOYEE_SERVICE_URL=http://employee-service:3003
+
+  # Leave Service
+  leave-service:
+    build: ./leave-service
+    container_name: leave-service
+    restart: always
+    ports:
+      - "3006:3006"
+    depends_on:
+      - mongodb
+      - employee-service
+    networks:
+      - hrms-network
+    environment:
+      - PORT=3006
+      - MONGODB_URI=mongodb://admin:password123@mongodb:27017/hrms_leave?authSource=admin
+      - JWT_SECRET=your_jwt_secret_key_here
+      - EMPLOYEE_SERVICE_URL=http://employee-service:3003
+
+networks:
+  hrms-network:
+    driver: bridge
+
+volumes:
+  mongo_data:
