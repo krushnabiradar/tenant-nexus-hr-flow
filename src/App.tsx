@@ -50,6 +50,16 @@ import DataManagementPage from "./pages/compliance/DataManagement";
 import ActivityMonitorPage from "./pages/compliance/Activity";
 import ComplianceSettingsPage from "./pages/compliance/Settings";
 
+// Recruitment Routes
+import RecruitmentDashboard from "./pages/recruitment/Dashboard";
+import RecruitmentJobsPage from "./pages/recruitment/Jobs";
+import CandidatesPage from "./pages/recruitment/Candidates";
+import InterviewsPage from "./pages/recruitment/Interviews";
+import OnboardingPage from "./pages/recruitment/Onboarding";
+import OffersPage from "./pages/recruitment/Offers";
+import RecruitmentReportsPage from "./pages/recruitment/Reports";
+import RecruitmentSettingsPage from "./pages/recruitment/Settings";
+
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -110,6 +120,16 @@ const App = () => (
           <Route path="/compliance/data-management" element={<DataManagementPage />} />
           <Route path="/compliance/activity" element={<ActivityMonitorPage />} />
           <Route path="/compliance/settings" element={<ComplianceSettingsPage />} />
+          
+          {/* Recruitment Routes */}
+          <Route path="/recruitment" element={<RecruitmentDashboard />} />
+          <Route path="/recruitment/jobs" element={<RecruitmentJobsPage />} />
+          <Route path="/recruitment/candidates" element={<CandidatesPage />} />
+          <Route path="/recruitment/interviews" element={<InterviewsPage />} />
+          <Route path="/recruitment/onboarding" element={<OnboardingPage />} />
+          <Route path="/recruitment/offers" element={<OffersPage />} />
+          <Route path="/recruitment/reports" element={<RecruitmentReportsPage />} />
+          <Route path="/recruitment/settings" element={<RecruitmentSettingsPage />} />
           
           {/* Catch-all Route */}
           <Route path="*" element={<NotFound />} />
