@@ -8,6 +8,7 @@ type User = {
   name?: string;
   companyName?: string;
   isAuthenticated: boolean;
+  plan?: string; // Add plan property to User type
 };
 
 type AuthContextType = {
