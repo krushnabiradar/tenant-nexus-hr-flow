@@ -4,7 +4,13 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "@/contexts/AuthContext";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
+
 import Landing from "./pages/Landing";
+import Login from "./pages/Login";
+
+// Admin Routes
 import AdminDashboard from "./pages/admin/Dashboard";
 import CompaniesPage from "./pages/admin/Companies";
 import UsersPage from "./pages/admin/Users";
@@ -12,6 +18,8 @@ import AdminAnalyticsPage from "./pages/admin/Analytics";
 import BillingPage from "./pages/admin/Billing";
 import SecurityPage from "./pages/admin/Security";
 import SettingsPage from "./pages/admin/Settings";
+
+// Company Routes
 import CompanyDashboard from "./pages/company/Dashboard";
 import EmployeesPage from "./pages/company/Employees";
 import AttendancePage from "./pages/company/Attendance";
@@ -71,81 +79,99 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Landing />} />
-          
-          {/* Admin Routes */}
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/admin/companies" element={<CompaniesPage />} />
-          <Route path="/admin/users" element={<UsersPage />} />
-          <Route path="/admin/analytics" element={<AdminAnalyticsPage />} />
-          <Route path="/admin/billing" element={<BillingPage />} />
-          <Route path="/admin/security" element={<SecurityPage />} />
-          <Route path="/admin/settings" element={<SettingsPage />} />
-          
-          {/* Company Routes */}
-          <Route path="/company" element={<CompanyDashboard />} />
-          <Route path="/company/employees" element={<EmployeesPage />} />
-          <Route path="/company/attendance" element={<AttendancePage />} />
-          <Route path="/company/payroll" element={<PayrollPage />} />
-          <Route path="/company/leaves" element={<LeavesPage />} />
-          <Route path="/company/jobs" element={<JobsPage />} />
-          <Route path="/company/compliance" element={<CompliancePage />} />
-          
-          {/* Employee Routes */}
-          <Route path="/employee" element={<EmployeeDashboard />} />
-          <Route path="/employee/attendance" element={<EmployeeAttendancePage />} />
-          <Route path="/employee/payslips" element={<EmployeePayslipsPage />} />
-          <Route path="/employee/leaves" element={<EmployeeLeavesPage />} />
-          <Route path="/employee/performance" element={<EmployeePerformancePage />} />
-          <Route path="/employee/announcements" element={<EmployeeAnnouncementsPage />} />
-          <Route path="/employee/profile" element={<EmployeeProfilePage />} />
-          
-          {/* Manager Routes */}
-          <Route path="/manager" element={<ManagerDashboard />} />
-          <Route path="/manager/team" element={<TeamPage />} />
-          <Route path="/manager/leave-requests" element={<LeaveRequestsPage />} />
-          <Route path="/manager/performance" element={<ManagerPerformancePage />} />
-          <Route path="/manager/tasks" element={<TasksPage />} />
-          <Route path="/manager/announcements" element={<ManagerAnnouncementsPage />} />
-          
-          {/* Finance Routes */}
-          <Route path="/finance" element={<FinanceDashboard />} />
-          <Route path="/finance/payroll" element={<FinancePayrollPage />} />
-          <Route path="/finance/taxes" element={<TaxesPage />} />
-          <Route path="/finance/reimbursements" element={<ReimbursementsPage />} />
-          <Route path="/finance/reports" element={<ReportsPage />} />
-          <Route path="/finance/analytics" element={<FinanceAnalyticsPage />} />
-          
-          {/* IT & Compliance Routes */}
-          <Route path="/compliance" element={<ComplianceDashboard />} />
-          <Route path="/compliance/security-logs" element={<SecurityLogsPage />} />
-          <Route path="/compliance/user-access" element={<UserAccessPage />} />
-          <Route path="/compliance/reports" element={<ComplianceReportsPage />} />
-          <Route path="/compliance/audit-logs" element={<AuditLogsPage />} />
-          <Route path="/compliance/data-management" element={<DataManagementPage />} />
-          <Route path="/compliance/activity" element={<ActivityMonitorPage />} />
-          <Route path="/compliance/settings" element={<ComplianceSettingsPage />} />
-          
-          {/* Recruitment Routes */}
-          <Route path="/recruitment" element={<RecruitmentDashboard />} />
-          <Route path="/recruitment/jobs" element={<RecruitmentJobsPage />} />
-          <Route path="/recruitment/candidates" element={<CandidatesPage />} />
-          <Route path="/recruitment/interviews" element={<InterviewsPage />} />
-          <Route path="/recruitment/onboarding" element={<OnboardingPage />} />
-          <Route path="/recruitment/offers" element={<OffersPage />} />
-          <Route path="/recruitment/reports" element={<RecruitmentReportsPage />} />
-          <Route path="/recruitment/settings" element={<RecruitmentSettingsPage />} />
-          
-          {/* Catch-all Route */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+    <BrowserRouter>
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/" element={<Landing />} />
+            <Route path="/login" element={<Login />} />
+            
+            {/* Admin Routes - Only SuperAdmin */}
+            <Route element={<ProtectedRoute allowedRoles={["SuperAdmin"]} />}>
+              <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/admin/companies" element={<CompaniesPage />} />
+              <Route path="/admin/users" element={<UsersPage />} />
+              <Route path="/admin/analytics" element={<AdminAnalyticsPage />} />
+              <Route path="/admin/billing" element={<BillingPage />} />
+              <Route path="/admin/security" element={<SecurityPage />} />
+              <Route path="/admin/settings" element={<SettingsPage />} />
+            </Route>
+            
+            {/* Company Routes - HR role */}
+            <Route element={<ProtectedRoute allowedRoles={["HR", "SuperAdmin"]} />}>
+              <Route path="/company" element={<CompanyDashboard />} />
+              <Route path="/company/employees" element={<EmployeesPage />} />
+              <Route path="/company/attendance" element={<AttendancePage />} />
+              <Route path="/company/payroll" element={<PayrollPage />} />
+              <Route path="/company/leaves" element={<LeavesPage />} />
+              <Route path="/company/jobs" element={<JobsPage />} />
+              <Route path="/company/compliance" element={<CompliancePage />} />
+            </Route>
+            
+            {/* Employee Routes */}
+            <Route element={<ProtectedRoute allowedRoles={["Employee", "HR", "Manager", "SuperAdmin"]} />}>
+              <Route path="/employee" element={<EmployeeDashboard />} />
+              <Route path="/employee/attendance" element={<EmployeeAttendancePage />} />
+              <Route path="/employee/payslips" element={<EmployeePayslipsPage />} />
+              <Route path="/employee/leaves" element={<EmployeeLeavesPage />} />
+              <Route path="/employee/performance" element={<EmployeePerformancePage />} />
+              <Route path="/employee/announcements" element={<EmployeeAnnouncementsPage />} />
+              <Route path="/employee/profile" element={<EmployeeProfilePage />} />
+            </Route>
+            
+            {/* Manager Routes */}
+            <Route element={<ProtectedRoute allowedRoles={["Manager", "HR", "SuperAdmin"]} />}>
+              <Route path="/manager" element={<ManagerDashboard />} />
+              <Route path="/manager/team" element={<TeamPage />} />
+              <Route path="/manager/leave-requests" element={<LeaveRequestsPage />} />
+              <Route path="/manager/performance" element={<ManagerPerformancePage />} />
+              <Route path="/manager/tasks" element={<TasksPage />} />
+              <Route path="/manager/announcements" element={<ManagerAnnouncementsPage />} />
+            </Route>
+            
+            {/* Finance Routes */}
+            <Route element={<ProtectedRoute allowedRoles={["HR", "SuperAdmin"]} />}>
+              <Route path="/finance" element={<FinanceDashboard />} />
+              <Route path="/finance/payroll" element={<FinancePayrollPage />} />
+              <Route path="/finance/taxes" element={<TaxesPage />} />
+              <Route path="/finance/reimbursements" element={<ReimbursementsPage />} />
+              <Route path="/finance/reports" element={<ReportsPage />} />
+              <Route path="/finance/analytics" element={<FinanceAnalyticsPage />} />
+            </Route>
+            
+            {/* IT & Compliance Routes */}
+            <Route element={<ProtectedRoute allowedRoles={["HR", "SuperAdmin"]} />}>
+              <Route path="/compliance" element={<ComplianceDashboard />} />
+              <Route path="/compliance/security-logs" element={<SecurityLogsPage />} />
+              <Route path="/compliance/user-access" element={<UserAccessPage />} />
+              <Route path="/compliance/reports" element={<ComplianceReportsPage />} />
+              <Route path="/compliance/audit-logs" element={<AuditLogsPage />} />
+              <Route path="/compliance/data-management" element={<DataManagementPage />} />
+              <Route path="/compliance/activity" element={<ActivityMonitorPage />} />
+              <Route path="/compliance/settings" element={<ComplianceSettingsPage />} />
+            </Route>
+            
+            {/* Recruitment Routes */}
+            <Route element={<ProtectedRoute allowedRoles={["HR", "SuperAdmin"]} />}>
+              <Route path="/recruitment" element={<RecruitmentDashboard />} />
+              <Route path="/recruitment/jobs" element={<RecruitmentJobsPage />} />
+              <Route path="/recruitment/candidates" element={<CandidatesPage />} />
+              <Route path="/recruitment/interviews" element={<InterviewsPage />} />
+              <Route path="/recruitment/onboarding" element={<OnboardingPage />} />
+              <Route path="/recruitment/offers" element={<OffersPage />} />
+              <Route path="/recruitment/reports" element={<RecruitmentReportsPage />} />
+              <Route path="/recruitment/settings" element={<RecruitmentSettingsPage />} />
+            </Route>
+            
+            {/* Catch-all Route */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </TooltipProvider>
+      </AuthProvider>
+    </BrowserRouter>
   </QueryClientProvider>
 );
 
