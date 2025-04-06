@@ -14,7 +14,7 @@ const Landing = () => {
           <div>
             {isAuthenticated ? (
               <div className="flex items-center gap-4">
-                <span>Welcome, {user?.name}</span>
+                <span className="text-gray-700">Welcome, {user?.name}</span>
                 <Button asChild variant="outline">
                   <Link to={`/${user?.role === "SuperAdmin" ? "admin" : user?.role === "HR" ? "company" : user?.role === "Manager" ? "manager" : "employee"}`}>
                     Dashboard
