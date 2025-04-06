@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -104,23 +103,25 @@ const Landing = () => {
       return;
     }
     
-    // Mock registration - in a real app, this would be an API call
-    setTimeout(() => {
-      // Store user info in localStorage
-      localStorage.setItem("user", JSON.stringify({
-        name,
-        email,
-        companyName,
-        role: "company", // New registrations default to company role
-        isAuthenticated: true,
-        plan: selectedPlan
-      }));
-      
-      toast.success(`Registration successful! Welcome to the ${selectedPlan} plan.`);
-      setRegisterDialogOpen(false);
-      navigate("/company"); // Redirect to company dashboard
-      setIsRegistering(false);
-    }, 1000);
+    // Store user info and tenant info separately
+    localStorage.setItem("user", JSON.stringify({
+      name,
+      email,
+      companyName,
+      role: "company", // New registrations default to company role
+      isAuthenticated: true
+    }));
+    
+    // Store tenant/company info separately
+    localStorage.setItem("tenant", JSON.stringify({
+      name: companyName,
+      plan: selectedPlan
+    }));
+    
+    toast.success(`Registration successful! Welcome to the ${selectedPlan} plan.`);
+    setRegisterDialogOpen(false);
+    navigate("/company"); // Redirect to company dashboard
+    setIsRegistering(false);
   };
 
   const handleDashboardRedirect = () => {
