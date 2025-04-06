@@ -1,6 +1,7 @@
 
 import { useState } from "react";
-import { Bell, Search, Settings, User } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Bell, Search, Settings, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -10,14 +11,39 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Header = () => {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
+
+  // Determine display name based on available user info
+  const displayName = user?.name || user?.email?.split("@")[0] || "User";
+  const initials = displayName.split(" ")
+    .map(name => name[0])
+    .join("")
+    .toUpperCase()
+    .substring(0, 2);
 
   return (
     <header className="bg-white border-b border-gray-200 h-16 flex items-center px-6 sticky top-0 z-10">
       <div className="flex items-center flex-1">
-        <h1 className="text-xl font-semibold text-hrms-slate hidden md:block">Super Admin Dashboard</h1>
+        <h1 className="text-xl font-semibold text-hrms-slate hidden md:block">
+          {user?.role === "admin" ? "Super Admin Dashboard" : 
+           user?.role === "company" ? "Company Dashboard" : 
+           user?.role === "employee" ? "Employee Dashboard" : 
+           user?.role === "manager" ? "Manager Dashboard" : 
+           user?.role === "finance" ? "Finance Dashboard" : 
+           user?.role === "compliance" ? "Compliance Dashboard" : 
+           user?.role === "recruitment" ? "Recruitment Dashboard" : 
+           "Dashboard"}
+        </h1>
       </div>
       
       <div className="relative mx-4 flex-1 max-w-md hidden md:block">
@@ -58,17 +84,26 @@ const Header = () => {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-10 w-10">
               <div className="h-10 w-10 rounded-full bg-hrms-blue flex items-center justify-center text-white">
-                <span className="font-medium text-sm">SA</span>
+                <span className="font-medium text-sm">{initials}</span>
               </div>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Super Admin</DropdownMenuLabel>
+            <DropdownMenuLabel>{displayName}</DropdownMenuLabel>
+            <DropdownMenuLabel className="text-xs text-gray-500 font-normal">{user?.email}</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem>Profile</DropdownMenuItem>
             <DropdownMenuItem>Account Settings</DropdownMenuItem>
+            {user?.plan && (
+              <DropdownMenuItem className="text-blue-600">
+                {user.plan} Plan
+              </DropdownMenuItem>
+            )}
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-red-600">Logout</DropdownMenuItem>
+            <DropdownMenuItem className="text-red-600" onClick={handleLogout}>
+              <LogOut className="h-4 w-4 mr-2" />
+              Logout
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

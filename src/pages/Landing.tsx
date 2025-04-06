@@ -1,11 +1,34 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ChevronRight, Menu, X, CheckCircle, Users, BarChart2, Shield } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogDescription, 
+  DialogFooter, 
+  DialogHeader, 
+  DialogTitle 
+} from "@/components/ui/dialog";
+import { ChevronRight, Menu, X, CheckCircle, Users, BarChart2, Shield, LogIn } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 const Landing = () => {
+  const navigate = useNavigate();
+  const { user, isAuthenticated, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [registerDialogOpen, setRegisterDialogOpen] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState("");
+  
+  // Registration form state
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [isRegistering, setIsRegistering] = useState(false);
 
   const features = [
     {
@@ -65,6 +88,71 @@ const Landing = () => {
     },
   ];
 
+  const handleGetStarted = (planName: string) => {
+    setSelectedPlan(planName);
+    setRegisterDialogOpen(true);
+  };
+
+  const handleRegister = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsRegistering(true);
+    
+    // Simple validation
+    if (!name || !email || !password || !companyName) {
+      toast.error("Please fill in all fields");
+      setIsRegistering(false);
+      return;
+    }
+    
+    // Mock registration - in a real app, this would be an API call
+    setTimeout(() => {
+      // Store user info in localStorage
+      localStorage.setItem("user", JSON.stringify({
+        name,
+        email,
+        companyName,
+        role: "company", // New registrations default to company role
+        isAuthenticated: true,
+        plan: selectedPlan
+      }));
+      
+      toast.success(`Registration successful! Welcome to the ${selectedPlan} plan.`);
+      setRegisterDialogOpen(false);
+      navigate("/company"); // Redirect to company dashboard
+      setIsRegistering(false);
+    }, 1000);
+  };
+
+  const handleDashboardRedirect = () => {
+    if (user) {
+      switch (user.role) {
+        case "admin":
+          navigate("/admin");
+          break;
+        case "company":
+          navigate("/company");
+          break;
+        case "employee":
+          navigate("/employee");
+          break;
+        case "manager":
+          navigate("/manager");
+          break;
+        case "finance":
+          navigate("/finance");
+          break;
+        case "compliance":
+          navigate("/compliance");
+          break;
+        case "recruitment":
+          navigate("/recruitment");
+          break;
+        default:
+          navigate("/");
+      }
+    }
+  };
+
   return (
     <div className="bg-gradient-to-b from-gray-50 to-white min-h-screen">
       {/* Navigation */}
@@ -103,12 +191,41 @@ const Landing = () => {
               </a>
             </nav>
             <div className="hidden md:flex items-center justify-end md:flex-1 lg:w-0">
-              <Link
-                to="/admin"
-                className="ml-8 whitespace-nowrap inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-hrms-blue hover:bg-blue-700"
-              >
-                Admin Login
-              </Link>
+              {isAuthenticated ? (
+                <div className="flex items-center space-x-4">
+                  <span className="text-hrms-slate">Welcome, {user?.name || user?.email}</span>
+                  <Button 
+                    onClick={handleDashboardRedirect}
+                    variant="outline"
+                    className="text-hrms-blue border-hrms-blue hover:bg-hrms-blue hover:text-white"
+                  >
+                    Dashboard
+                  </Button>
+                  <Button 
+                    onClick={logout}
+                    variant="ghost"
+                    className="text-gray-600"
+                  >
+                    Logout
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex items-center space-x-4">
+                  <Link
+                    to="/login"
+                    className="text-base font-medium text-hrms-blue hover:text-blue-800"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    to="/login"
+                    className="ml-8 whitespace-nowrap inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-hrms-blue hover:bg-blue-700"
+                  >
+                    <LogIn className="mr-2 h-4 w-4" />
+                    Get Started
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -153,12 +270,39 @@ const Landing = () => {
                 </div>
               </div>
               <div className="py-6 px-5 space-y-6">
-                <Link
-                  to="/admin"
-                  className="w-full flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-hrms-blue hover:bg-blue-700"
-                >
-                  Admin Login
-                </Link>
+                {isAuthenticated ? (
+                  <div className="space-y-4">
+                    <p className="text-hrms-slate">Welcome, {user?.name || user?.email}</p>
+                    <Button 
+                      onClick={handleDashboardRedirect}
+                      className="w-full bg-hrms-blue hover:bg-blue-700"
+                    >
+                      Dashboard
+                    </Button>
+                    <Button 
+                      onClick={logout}
+                      variant="outline"
+                      className="w-full"
+                    >
+                      Logout
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <Link
+                      to="/login"
+                      className="w-full flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-hrms-blue hover:bg-blue-700"
+                    >
+                      Login
+                    </Link>
+                    <Link
+                      to="/login"
+                      className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-base font-medium text-hrms-blue bg-white hover:bg-gray-50"
+                    >
+                      Get Started
+                    </Link>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -179,12 +323,21 @@ const Landing = () => {
             </p>
             <div className="mt-5 max-w-md mx-auto sm:flex sm:justify-center md:mt-8">
               <div className="rounded-md shadow">
-                <Link
-                  to="/admin"
-                  className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-hrms-blue hover:bg-blue-700 md:py-4 md:text-lg md:px-10"
-                >
-                  Get Started
-                </Link>
+                {isAuthenticated ? (
+                  <Button
+                    onClick={handleDashboardRedirect}
+                    className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-hrms-blue hover:bg-blue-700 md:py-4 md:text-lg md:px-10"
+                  >
+                    Go to Dashboard
+                  </Button>
+                ) : (
+                  <Link
+                    to="/login"
+                    className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-hrms-blue hover:bg-blue-700 md:py-4 md:text-lg md:px-10"
+                  >
+                    Get Started
+                  </Link>
+                )}
               </div>
               <div className="mt-3 rounded-md shadow sm:mt-0 sm:ml-3">
                 <a
@@ -258,6 +411,7 @@ const Landing = () => {
                   <Button
                     variant={plan.popular ? "default" : "outline"}
                     className={`mt-6 w-full ${plan.popular ? "bg-hrms-blue hover:bg-blue-700" : ""}`}
+                    onClick={() => handleGetStarted(plan.name)}
                   >
                     Get started
                   </Button>
@@ -293,13 +447,23 @@ const Landing = () => {
                 Join hundreds of companies already using NexusHR to manage their workforce efficiently.
               </p>
               <div className="mt-8">
-                <Link
-                  to="/admin"
-                  className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-hrms-blue bg-white hover:bg-blue-50"
-                >
-                  Get Started Today
-                  <ChevronRight className="ml-2 h-5 w-5" />
-                </Link>
+                {isAuthenticated ? (
+                  <Button
+                    onClick={handleDashboardRedirect}
+                    className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-hrms-blue bg-white hover:bg-blue-50"
+                  >
+                    Go to Dashboard
+                    <ChevronRight className="ml-2 h-5 w-5" />
+                  </Button>
+                ) : (
+                  <Link
+                    to="/login"
+                    className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-hrms-blue bg-white hover:bg-blue-50"
+                  >
+                    Get Started Today
+                    <ChevronRight className="ml-2 h-5 w-5" />
+                  </Link>
+                )}
               </div>
             </div>
             <div className="mt-10 lg:mt-0 lg:col-start-2">
@@ -360,6 +524,72 @@ const Landing = () => {
           </div>
         </div>
       </footer>
+
+      {/* Registration Dialog */}
+      <Dialog open={registerDialogOpen} onOpenChange={setRegisterDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Register for {selectedPlan} Plan</DialogTitle>
+            <DialogDescription>
+              Create your account to get started with the {selectedPlan} plan.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleRegister} className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Full Name</Label>
+              <Input 
+                id="name" 
+                type="text" 
+                placeholder="John Doe" 
+                value={name} 
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input 
+                id="email" 
+                type="email" 
+                placeholder="name@example.com" 
+                value={email} 
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="company-name">Company Name</Label>
+              <Input 
+                id="company-name" 
+                type="text" 
+                placeholder="Acme Inc." 
+                value={companyName} 
+                onChange={(e) => setCompanyName(e.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input 
+                id="password" 
+                type="password" 
+                value={password} 
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+            <DialogFooter>
+              <Button 
+                type="submit" 
+                className="w-full bg-hrms-blue hover:bg-blue-700"
+                disabled={isRegistering}
+              >
+                {isRegistering ? "Creating account..." : "Create account"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
