@@ -213,12 +213,6 @@ const Landing = () => {
                 <div className="flex items-center space-x-4">
                   <Link
                     to="/login"
-                    className="text-base font-medium text-hrms-blue hover:text-blue-800"
-                  >
-                    Login
-                  </Link>
-                  <Link
-                    to="/login"
                     className="ml-8 whitespace-nowrap inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-hrms-blue hover:bg-blue-700"
                   >
                     <LogIn className="mr-2 h-4 w-4" />
