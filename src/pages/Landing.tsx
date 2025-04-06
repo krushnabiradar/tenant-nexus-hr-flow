@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -11,7 +12,7 @@ import {
   DialogHeader, 
   DialogTitle 
 } from "@/components/ui/dialog";
-import { ChevronRight, Menu, X, CheckCircle, Users, BarChart2, Shield, LogIn } from "lucide-react";
+import { ChevronRight, Menu, X, CheckCircle, Users, BarChart2, Shield, LogIn, Mail } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
@@ -19,15 +20,16 @@ const Landing = () => {
   const navigate = useNavigate();
   const { user, isAuthenticated, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [registerDialogOpen, setRegisterDialogOpen] = useState(false);
+  const [contactDialogOpen, setContactDialogOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState("");
   
-  // Registration form state
+  // Contact form state
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [companyName, setCompanyName] = useState("");
-  const [isRegistering, setIsRegistering] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [message, setMessage] = useState("");
+  const [isSending, setIsSending] = useState(false);
 
   const features = [
     {
@@ -52,6 +54,7 @@ const Landing = () => {
       name: "Starter",
       price: "49",
       description: "Perfect for small businesses",
+      maxEmployees: 50,
       features: [
         "Up to 50 employees",
         "Core HR functionality",
@@ -64,6 +67,7 @@ const Landing = () => {
       name: "Business",
       price: "99",
       description: "Growing companies",
+      maxEmployees: 200,
       features: [
         "Up to 200 employees",
         "Advanced HR tools",
@@ -77,8 +81,9 @@ const Landing = () => {
       name: "Enterprise",
       price: "249",
       description: "Large organizations",
+      maxEmployees: 1000,
       features: [
-        "Unlimited employees",
+        "Up to 1000 employees",
         "Custom workflows",
         "Advanced integrations",
         "Dedicated account manager",
@@ -87,41 +92,35 @@ const Landing = () => {
     },
   ];
 
-  const handleGetStarted = (planName: string) => {
+  const handleContactUs = (planName: string) => {
     setSelectedPlan(planName);
-    setRegisterDialogOpen(true);
+    setContactDialogOpen(true);
   };
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleSendRequest = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsRegistering(true);
+    setIsSending(true);
     
     // Simple validation
-    if (!name || !email || !password || !companyName) {
-      toast.error("Please fill in all fields");
-      setIsRegistering(false);
+    if (!name || !email || !companyName || !phoneNumber) {
+      toast.error("Please fill in all required fields");
+      setIsSending(false);
       return;
     }
     
-    // Store user info and tenant info separately
-    localStorage.setItem("user", JSON.stringify({
-      name,
-      email,
-      companyName,
-      role: "company", // New registrations default to company role
-      isAuthenticated: true
-    }));
-    
-    // Store tenant/company info separately
-    localStorage.setItem("tenant", JSON.stringify({
-      name: companyName,
-      plan: selectedPlan
-    }));
-    
-    toast.success(`Registration successful! Welcome to the ${selectedPlan} plan.`);
-    setRegisterDialogOpen(false);
-    navigate("/company"); // Redirect to company dashboard
-    setIsRegistering(false);
+    // Mock API call - in a real app, this would send the data to your backend
+    setTimeout(() => {
+      toast.success("Your request has been sent! Our team will contact you shortly.");
+      setContactDialogOpen(false);
+      
+      // Reset form
+      setName("");
+      setEmail("");
+      setCompanyName("");
+      setPhoneNumber("");
+      setMessage("");
+      setIsSending(false);
+    }, 1000);
   };
 
   const handleDashboardRedirect = () => {
@@ -223,7 +222,7 @@ const Landing = () => {
                     className="ml-8 whitespace-nowrap inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-hrms-blue hover:bg-blue-700"
                   >
                     <LogIn className="mr-2 h-4 w-4" />
-                    Get Started
+                    Sign In
                   </Link>
                 </div>
               )}
@@ -296,12 +295,6 @@ const Landing = () => {
                     >
                       Login
                     </Link>
-                    <Link
-                      to="/login"
-                      className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-base font-medium text-hrms-blue bg-white hover:bg-gray-50"
-                    >
-                      Get Started
-                    </Link>
                   </div>
                 )}
               </div>
@@ -336,7 +329,7 @@ const Landing = () => {
                     to="/login"
                     className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-hrms-blue hover:bg-blue-700 md:py-4 md:text-lg md:px-10"
                   >
-                    Get Started
+                    Sign In
                   </Link>
                 )}
               </div>
@@ -412,9 +405,9 @@ const Landing = () => {
                   <Button
                     variant={plan.popular ? "default" : "outline"}
                     className={`mt-6 w-full ${plan.popular ? "bg-hrms-blue hover:bg-blue-700" : ""}`}
-                    onClick={() => handleGetStarted(plan.name)}
+                    onClick={() => handleContactUs(plan.name)}
                   >
-                    Get started
+                    Contact Sales
                   </Button>
                 </div>
                 <div className="pt-6 pb-8 px-6">
@@ -461,7 +454,7 @@ const Landing = () => {
                     to="/login"
                     className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-hrms-blue bg-white hover:bg-blue-50"
                   >
-                    Get Started Today
+                    Sign In
                     <ChevronRight className="ml-2 h-5 w-5" />
                   </Link>
                 )}
@@ -526,18 +519,18 @@ const Landing = () => {
         </div>
       </footer>
 
-      {/* Registration Dialog */}
-      <Dialog open={registerDialogOpen} onOpenChange={setRegisterDialogOpen}>
+      {/* Contact Sales Dialog */}
+      <Dialog open={contactDialogOpen} onOpenChange={setContactDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Register for {selectedPlan} Plan</DialogTitle>
+            <DialogTitle>Contact Sales for {selectedPlan} Plan</DialogTitle>
             <DialogDescription>
-              Create your account to get started with the {selectedPlan} plan.
+              Submit your information and we'll reach out to discuss how we can set up your company with the {selectedPlan} plan.
             </DialogDescription>
           </DialogHeader>
-          <form onSubmit={handleRegister} className="space-y-4 py-4">
+          <form onSubmit={handleSendRequest} className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Full Name</Label>
+              <Label htmlFor="name">Full Name*</Label>
               <Input 
                 id="name" 
                 type="text" 
@@ -548,7 +541,7 @@ const Landing = () => {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">Email*</Label>
               <Input 
                 id="email" 
                 type="email" 
@@ -559,7 +552,7 @@ const Landing = () => {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="company-name">Company Name</Label>
+              <Label htmlFor="company-name">Company Name*</Label>
               <Input 
                 id="company-name" 
                 type="text" 
@@ -570,22 +563,40 @@ const Landing = () => {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="phone">Phone Number*</Label>
               <Input 
-                id="password" 
-                type="password" 
-                value={password} 
-                onChange={(e) => setPassword(e.target.value)}
+                id="phone" 
+                type="tel" 
+                placeholder="+1 (555) 123-4567" 
+                value={phoneNumber} 
+                onChange={(e) => setPhoneNumber(e.target.value)}
                 required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="message">Additional Information</Label>
+              <textarea
+                id="message"
+                className="min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                placeholder="Tell us about your specific needs..."
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
               />
             </div>
             <DialogFooter>
               <Button 
                 type="submit" 
                 className="w-full bg-hrms-blue hover:bg-blue-700"
-                disabled={isRegistering}
+                disabled={isSending}
               >
-                {isRegistering ? "Creating account..." : "Create account"}
+                {isSending ? (
+                  "Sending request..."
+                ) : (
+                  <>
+                    <Mail className="h-4 w-4 mr-2" />
+                    Send Request
+                  </>
+                )}
               </Button>
             </DialogFooter>
           </form>

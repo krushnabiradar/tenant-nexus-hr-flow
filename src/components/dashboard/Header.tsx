@@ -14,7 +14,7 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 
 const Header = () => {
-  const { user, logout } = useAuth();
+  const { user, tenant, logout } = useAuth();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -30,24 +30,6 @@ const Header = () => {
     .join("")
     .toUpperCase()
     .substring(0, 2);
-
-  // Get company plan from localStorage if user is a company role
-  const getCompanyPlan = () => {
-    if (user?.role === "company") {
-      try {
-        const tenant = localStorage.getItem("tenant");
-        if (tenant) {
-          const parsedTenant = JSON.parse(tenant);
-          return parsedTenant.plan;
-        }
-      } catch (error) {
-        console.error("Error parsing tenant data:", error);
-      }
-    }
-    return null;
-  };
-
-  const companyPlan = getCompanyPlan();
 
   return (
     <header className="bg-white border-b border-gray-200 h-16 flex items-center px-6 sticky top-0 z-10">
@@ -112,9 +94,9 @@ const Header = () => {
             <DropdownMenuSeparator />
             <DropdownMenuItem>Profile</DropdownMenuItem>
             <DropdownMenuItem>Account Settings</DropdownMenuItem>
-            {companyPlan && (
+            {tenant?.plan && user?.role === "company" && (
               <DropdownMenuItem className="text-blue-600">
-                {companyPlan} Plan
+                {tenant.plan} Plan ({tenant.totalEmployees || 0} employees)
               </DropdownMenuItem>
             )}
             <DropdownMenuSeparator />
