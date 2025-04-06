@@ -1,11 +1,35 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ChevronRight, Menu, X, CheckCircle, Users, BarChart2, Shield } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogDescription, 
+  DialogFooter, 
+  DialogHeader, 
+  DialogTitle 
+} from "@/components/ui/dialog";
+import { ChevronRight, Menu, X, CheckCircle, Users, BarChart2, Shield, LogIn, Mail } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 const Landing = () => {
+  const navigate = useNavigate();
+  const { user, isAuthenticated, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [contactDialogOpen, setContactDialogOpen] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState("");
+  
+  // Contact form state
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [message, setMessage] = useState("");
+  const [isSending, setIsSending] = useState(false);
 
   const features = [
     {
@@ -30,6 +54,7 @@ const Landing = () => {
       name: "Starter",
       price: "49",
       description: "Perfect for small businesses",
+      maxEmployees: 50,
       features: [
         "Up to 50 employees",
         "Core HR functionality",
@@ -42,6 +67,7 @@ const Landing = () => {
       name: "Business",
       price: "99",
       description: "Growing companies",
+      maxEmployees: 200,
       features: [
         "Up to 200 employees",
         "Advanced HR tools",
@@ -55,8 +81,9 @@ const Landing = () => {
       name: "Enterprise",
       price: "249",
       description: "Large organizations",
+      maxEmployees: 1000,
       features: [
-        "Unlimited employees",
+        "Up to 1000 employees",
         "Custom workflows",
         "Advanced integrations",
         "Dedicated account manager",
@@ -64,6 +91,67 @@ const Landing = () => {
       ],
     },
   ];
+
+  const handleContactUs = (planName: string) => {
+    setSelectedPlan(planName);
+    setContactDialogOpen(true);
+  };
+
+  const handleSendRequest = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSending(true);
+    
+    // Simple validation
+    if (!name || !email || !companyName || !phoneNumber) {
+      toast.error("Please fill in all required fields");
+      setIsSending(false);
+      return;
+    }
+    
+    // Mock API call - in a real app, this would send the data to your backend
+    setTimeout(() => {
+      toast.success("Your request has been sent! Our team will contact you shortly.");
+      setContactDialogOpen(false);
+      
+      // Reset form
+      setName("");
+      setEmail("");
+      setCompanyName("");
+      setPhoneNumber("");
+      setMessage("");
+      setIsSending(false);
+    }, 1000);
+  };
+
+  const handleDashboardRedirect = () => {
+    if (user) {
+      switch (user.role) {
+        case "admin":
+          navigate("/admin");
+          break;
+        case "company":
+          navigate("/company");
+          break;
+        case "employee":
+          navigate("/employee");
+          break;
+        case "manager":
+          navigate("/manager");
+          break;
+        case "finance":
+          navigate("/finance");
+          break;
+        case "compliance":
+          navigate("/compliance");
+          break;
+        case "recruitment":
+          navigate("/recruitment");
+          break;
+        default:
+          navigate("/");
+      }
+    }
+  };
 
   return (
     <div className="bg-gradient-to-b from-gray-50 to-white min-h-screen">
@@ -103,12 +191,41 @@ const Landing = () => {
               </a>
             </nav>
             <div className="hidden md:flex items-center justify-end md:flex-1 lg:w-0">
-              <Link
-                to="/admin"
-                className="ml-8 whitespace-nowrap inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-hrms-blue hover:bg-blue-700"
-              >
-                Admin Login
-              </Link>
+              {isAuthenticated ? (
+                <div className="flex items-center space-x-4">
+                  <span className="text-hrms-slate">Welcome, {user?.name || user?.email}</span>
+                  <Button 
+                    onClick={handleDashboardRedirect}
+                    variant="outline"
+                    className="text-hrms-blue border-hrms-blue hover:bg-hrms-blue hover:text-white"
+                  >
+                    Dashboard
+                  </Button>
+                  <Button 
+                    onClick={logout}
+                    variant="ghost"
+                    className="text-gray-600"
+                  >
+                    Logout
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex items-center space-x-4">
+                  <Link
+                    to="/login"
+                    className="text-base font-medium text-hrms-blue hover:text-blue-800"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    to="/login"
+                    className="ml-8 whitespace-nowrap inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-hrms-blue hover:bg-blue-700"
+                  >
+                    <LogIn className="mr-2 h-4 w-4" />
+                    Sign In
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -153,12 +270,33 @@ const Landing = () => {
                 </div>
               </div>
               <div className="py-6 px-5 space-y-6">
-                <Link
-                  to="/admin"
-                  className="w-full flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-hrms-blue hover:bg-blue-700"
-                >
-                  Admin Login
-                </Link>
+                {isAuthenticated ? (
+                  <div className="space-y-4">
+                    <p className="text-hrms-slate">Welcome, {user?.name || user?.email}</p>
+                    <Button 
+                      onClick={handleDashboardRedirect}
+                      className="w-full bg-hrms-blue hover:bg-blue-700"
+                    >
+                      Dashboard
+                    </Button>
+                    <Button 
+                      onClick={logout}
+                      variant="outline"
+                      className="w-full"
+                    >
+                      Logout
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <Link
+                      to="/login"
+                      className="w-full flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-hrms-blue hover:bg-blue-700"
+                    >
+                      Login
+                    </Link>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -179,12 +317,21 @@ const Landing = () => {
             </p>
             <div className="mt-5 max-w-md mx-auto sm:flex sm:justify-center md:mt-8">
               <div className="rounded-md shadow">
-                <Link
-                  to="/admin"
-                  className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-hrms-blue hover:bg-blue-700 md:py-4 md:text-lg md:px-10"
-                >
-                  Get Started
-                </Link>
+                {isAuthenticated ? (
+                  <Button
+                    onClick={handleDashboardRedirect}
+                    className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-hrms-blue hover:bg-blue-700 md:py-4 md:text-lg md:px-10"
+                  >
+                    Go to Dashboard
+                  </Button>
+                ) : (
+                  <Link
+                    to="/login"
+                    className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-hrms-blue hover:bg-blue-700 md:py-4 md:text-lg md:px-10"
+                  >
+                    Sign In
+                  </Link>
+                )}
               </div>
               <div className="mt-3 rounded-md shadow sm:mt-0 sm:ml-3">
                 <a
@@ -258,8 +405,9 @@ const Landing = () => {
                   <Button
                     variant={plan.popular ? "default" : "outline"}
                     className={`mt-6 w-full ${plan.popular ? "bg-hrms-blue hover:bg-blue-700" : ""}`}
+                    onClick={() => handleContactUs(plan.name)}
                   >
-                    Get started
+                    Contact Sales
                   </Button>
                 </div>
                 <div className="pt-6 pb-8 px-6">
@@ -293,13 +441,23 @@ const Landing = () => {
                 Join hundreds of companies already using NexusHR to manage their workforce efficiently.
               </p>
               <div className="mt-8">
-                <Link
-                  to="/admin"
-                  className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-hrms-blue bg-white hover:bg-blue-50"
-                >
-                  Get Started Today
-                  <ChevronRight className="ml-2 h-5 w-5" />
-                </Link>
+                {isAuthenticated ? (
+                  <Button
+                    onClick={handleDashboardRedirect}
+                    className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-hrms-blue bg-white hover:bg-blue-50"
+                  >
+                    Go to Dashboard
+                    <ChevronRight className="ml-2 h-5 w-5" />
+                  </Button>
+                ) : (
+                  <Link
+                    to="/login"
+                    className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-hrms-blue bg-white hover:bg-blue-50"
+                  >
+                    Sign In
+                    <ChevronRight className="ml-2 h-5 w-5" />
+                  </Link>
+                )}
               </div>
             </div>
             <div className="mt-10 lg:mt-0 lg:col-start-2">
@@ -360,6 +518,90 @@ const Landing = () => {
           </div>
         </div>
       </footer>
+
+      {/* Contact Sales Dialog */}
+      <Dialog open={contactDialogOpen} onOpenChange={setContactDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Contact Sales for {selectedPlan} Plan</DialogTitle>
+            <DialogDescription>
+              Submit your information and we'll reach out to discuss how we can set up your company with the {selectedPlan} plan.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleSendRequest} className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Full Name*</Label>
+              <Input 
+                id="name" 
+                type="text" 
+                placeholder="John Doe" 
+                value={name} 
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email*</Label>
+              <Input 
+                id="email" 
+                type="email" 
+                placeholder="name@example.com" 
+                value={email} 
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="company-name">Company Name*</Label>
+              <Input 
+                id="company-name" 
+                type="text" 
+                placeholder="Acme Inc." 
+                value={companyName} 
+                onChange={(e) => setCompanyName(e.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="phone">Phone Number*</Label>
+              <Input 
+                id="phone" 
+                type="tel" 
+                placeholder="+1 (555) 123-4567" 
+                value={phoneNumber} 
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="message">Additional Information</Label>
+              <textarea
+                id="message"
+                className="min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                placeholder="Tell us about your specific needs..."
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+              />
+            </div>
+            <DialogFooter>
+              <Button 
+                type="submit" 
+                className="w-full bg-hrms-blue hover:bg-blue-700"
+                disabled={isSending}
+              >
+                {isSending ? (
+                  "Sending request..."
+                ) : (
+                  <>
+                    <Mail className="h-4 w-4 mr-2" />
+                    Send Request
+                  </>
+                )}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
