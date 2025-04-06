@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Bell, Search, Settings, LogOut } from "lucide-react";
+import { Bell, Search, Settings, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -31,25 +31,17 @@ const Header = () => {
     .toUpperCase()
     .substring(0, 2);
 
-  // Map backend roles to frontend display
-  const getRoleDisplay = (role: string) => {
-    switch(role) {
-      case "SuperAdmin": return "Super Admin";
-      case "HR": return "HR Admin";
-      case "Manager": return "Manager";
-      case "Employee": return "Employee";
-      default: return role;
-    }
-  };
-
   return (
     <header className="bg-white border-b border-gray-200 h-16 flex items-center px-6 sticky top-0 z-10">
       <div className="flex items-center flex-1">
         <h1 className="text-xl font-semibold text-hrms-slate hidden md:block">
-          {user?.role === "SuperAdmin" ? "Super Admin Dashboard" : 
-           user?.role === "HR" ? "Company Dashboard" : 
-           user?.role === "Manager" ? "Manager Dashboard" : 
-           user?.role === "Employee" ? "Employee Dashboard" : 
+          {user?.role === "admin" ? "Super Admin Dashboard" : 
+           user?.role === "company" ? "Company Dashboard" : 
+           user?.role === "employee" ? "Employee Dashboard" : 
+           user?.role === "manager" ? "Manager Dashboard" : 
+           user?.role === "finance" ? "Finance Dashboard" : 
+           user?.role === "compliance" ? "Compliance Dashboard" : 
+           user?.role === "recruitment" ? "Recruitment Dashboard" : 
            "Dashboard"}
         </h1>
       </div>
@@ -99,11 +91,10 @@ const Header = () => {
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>{displayName}</DropdownMenuLabel>
             <DropdownMenuLabel className="text-xs text-gray-500 font-normal">{user?.email}</DropdownMenuLabel>
-            <DropdownMenuLabel className="text-xs text-gray-500 font-normal">{getRoleDisplay(user?.role || "")}</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem>Profile</DropdownMenuItem>
             <DropdownMenuItem>Account Settings</DropdownMenuItem>
-            {tenant?.plan && user?.role === "HR" && (
+            {tenant?.plan && user?.role === "company" && (
               <DropdownMenuItem className="text-blue-600">
                 {tenant.plan} Plan ({tenant.totalEmployees || 0} employees)
               </DropdownMenuItem>

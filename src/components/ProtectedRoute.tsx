@@ -8,35 +8,17 @@ type ProtectedRouteProps = {
 };
 
 const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
-  const { user, isAuthenticated, isLoading } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const location = useLocation();
-  
-  // Show loading state or spinner while checking authentication
-  if (isLoading) {
-    return <div className="flex items-center justify-center h-screen">Loading...</div>;
-  }
   
   if (!isAuthenticated) {
     // Redirect to login if not authenticated
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
   
-  // Map the backend roles to frontend roles for route protection
-  const mapRole = (backendRole: string) => {
-    switch (backendRole) {
-      case "SuperAdmin": return "admin";
-      case "HR": return "company";
-      case "Manager": return "manager";
-      case "Employee": return "employee";
-      default: return backendRole.toLowerCase();
-    }
-  };
-  
-  const mappedUserRole = user ? mapRole(user.role) : '';
-  
-  if (allowedRoles && user && !allowedRoles.includes(mappedUserRole)) {
+  if (allowedRoles && user && !allowedRoles.includes(user.role)) {
     // Redirect to appropriate dashboard if user doesn't have the required role
-    switch (mappedUserRole) {
+    switch (user.role) {
       case "admin":
         return <Navigate to="/admin" replace />;
       case "company":
