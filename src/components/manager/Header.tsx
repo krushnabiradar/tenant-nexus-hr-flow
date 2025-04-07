@@ -15,7 +15,7 @@ import { useAuth } from "@/contexts/AuthContext";
 
 const ManagerHeader = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const { user, logout } = useAuth();
+  const { user, tenant, logout } = useAuth();
   const navigate = useNavigate();
   
   const handleLogout = () => {
@@ -35,7 +35,7 @@ const ManagerHeader = () => {
     <header className="bg-white border-b border-gray-200 h-16 flex items-center px-6 sticky top-0 z-10">
       <div className="flex items-center flex-1">
         <h1 className="text-xl font-semibold text-gray-800 hidden md:block">
-          {user?.tenant?.name || "Company"} Manager Portal
+          {tenant?.name || "Company"} Manager Portal
         </h1>
       </div>
       

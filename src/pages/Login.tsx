@@ -10,7 +10,7 @@ import { useAuth } from "@/contexts/AuthContext";
 
 const Login = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   
   // Login form state
   const [loginEmail, setLoginEmail] = useState("");
@@ -29,35 +29,38 @@ const Login = () => {
     }
     
     try {
-      const user = await login(loginEmail, loginPassword);
+      await login(loginEmail, loginPassword);
       
       toast.success("Login successful!");
       
-      // Redirect based on role
-      switch (user.role) {
-        case "admin":
-          navigate("/admin");
-          break;
-        case "company":
-          navigate("/company");
-          break;
-        case "employee":
-          navigate("/employee");
-          break;
-        case "manager":
-          navigate("/manager");
-          break;
-        case "finance":
-          navigate("/finance");
-          break;
-        case "compliance":
-          navigate("/compliance");
-          break;
-        case "recruitment":
-          navigate("/recruitment");
-          break;
-        default:
-          navigate("/");
+      // Since login returns void, we need to use the user from context
+      if (user) {
+        // Redirect based on role
+        switch (user.role) {
+          case "admin":
+            navigate("/admin");
+            break;
+          case "company":
+            navigate("/company");
+            break;
+          case "employee":
+            navigate("/employee");
+            break;
+          case "manager":
+            navigate("/manager");
+            break;
+          case "finance":
+            navigate("/finance");
+            break;
+          case "compliance":
+            navigate("/compliance");
+            break;
+          case "recruitment":
+            navigate("/recruitment");
+            break;
+          default:
+            navigate("/");
+        }
       }
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Invalid email or password");
