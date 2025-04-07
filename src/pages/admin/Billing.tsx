@@ -26,6 +26,7 @@ const planSchema = z.object({
   price: z.coerce.number().positive({ message: "Price must be positive" }),
   billingCycle: z.enum(["monthly", "quarterly", "yearly"]),
   maxEmployees: z.coerce.number().positive({ message: "Max employees must be positive" }),
+  // Change this to accept a string and transform it to an array
   features: z.string().transform(val => val.split(",").map(item => item.trim())),
   isActive: z.boolean().default(true),
   displayOrder: z.coerce.number().int().default(0)
@@ -59,7 +60,7 @@ const BillingPage = () => {
       price: 0,
       billingCycle: "monthly",
       maxEmployees: 0,
-      features: "",
+      features: "", // String that will be transformed to array on submit
       isActive: true,
       displayOrder: 0
     }
@@ -77,7 +78,7 @@ const BillingPage = () => {
         price: selectedPlan.price,
         billingCycle: selectedPlan.billingCycle,
         maxEmployees: selectedPlan.maxEmployees,
-        features: featuresString,
+        features: featuresString, // This is now correct - a string
         isActive: selectedPlan.isActive,
         displayOrder: selectedPlan.displayOrder
       });
@@ -88,7 +89,7 @@ const BillingPage = () => {
         price: 0,
         billingCycle: "monthly",
         maxEmployees: 0,
-        features: "",
+        features: "", // String that will be transformed to array on submit
         isActive: true,
         displayOrder: 0
       });
