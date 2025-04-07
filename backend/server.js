@@ -6,6 +6,9 @@ const cors = require('cors');
 const authRoutes = require('./routes/auth.routes');
 const userRoutes = require('./routes/user.routes');
 const tenantRoutes = require('./routes/tenant.routes');
+const leaveRoutes = require('./routes/leave.routes');
+const attendanceRoutes = require('./routes/attendance.routes');
+const announcementRoutes = require('./routes/announcement.routes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -23,6 +26,9 @@ mongoose.connect(process.env.MONGODB_URI)
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/tenants', tenantRoutes);
+app.use('/api/leaves', leaveRoutes);
+app.use('/api/attendance', attendanceRoutes);
+app.use('/api/announcements', announcementRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {

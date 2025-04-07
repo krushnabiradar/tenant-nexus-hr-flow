@@ -1,4 +1,3 @@
-
 import axios from 'axios';
 
 // Create an Axios instance with base URL
@@ -93,6 +92,105 @@ export const tenantsAPI = {
   
   getTenantStats: async (id: string) => {
     const response = await api.get(`/tenants/${id}/stats`);
+    return response.data;
+  },
+};
+
+// Leaves API calls
+export const leavesAPI = {
+  getAllLeaves: async (params?: { employeeId?: string; status?: string; tenantId?: string }) => {
+    const response = await api.get('/leaves', { params });
+    return response.data;
+  },
+  
+  getLeaveById: async (id: string) => {
+    const response = await api.get(`/leaves/${id}`);
+    return response.data;
+  },
+  
+  createLeave: async (leaveData: any) => {
+    const response = await api.post('/leaves', leaveData);
+    return response.data;
+  },
+  
+  updateLeave: async (id: string, leaveData: any) => {
+    const response = await api.put(`/leaves/${id}`, leaveData);
+    return response.data;
+  },
+  
+  deleteLeave: async (id: string) => {
+    const response = await api.delete(`/leaves/${id}`);
+    return response.data;
+  },
+  
+  getEmployeeLeaveStats: async (employeeId: string) => {
+    const response = await api.get(`/leaves/employee/${employeeId}/stats`);
+    return response.data;
+  },
+};
+
+// Attendance API calls
+export const attendanceAPI = {
+  getAllAttendance: async (params?: { employeeId?: string; date?: string; tenantId?: string }) => {
+    const response = await api.get('/attendance', { params });
+    return response.data;
+  },
+  
+  getAttendanceById: async (id: string) => {
+    const response = await api.get(`/attendance/${id}`);
+    return response.data;
+  },
+  
+  clockIn: async (data: { employeeId: string; tenantId: string }) => {
+    const response = await api.post('/attendance/clock-in', data);
+    return response.data;
+  },
+  
+  clockOut: async (data: { employeeId: string }) => {
+    const response = await api.post('/attendance/clock-out', data);
+    return response.data;
+  },
+  
+  updateAttendance: async (id: string, attendanceData: any) => {
+    const response = await api.put(`/attendance/${id}`, attendanceData);
+    return response.data;
+  },
+  
+  deleteAttendance: async (id: string) => {
+    const response = await api.delete(`/attendance/${id}`);
+    return response.data;
+  },
+  
+  getEmployeeAttendanceStats: async (employeeId: string, params?: { month?: string; year?: string }) => {
+    const response = await api.get(`/attendance/employee/${employeeId}/stats`, { params });
+    return response.data;
+  },
+};
+
+// Announcements API calls
+export const announcementsAPI = {
+  getAllAnnouncements: async (params?: { tenantId?: string; category?: string }) => {
+    const response = await api.get('/announcements', { params });
+    return response.data;
+  },
+  
+  getAnnouncementById: async (id: string) => {
+    const response = await api.get(`/announcements/${id}`);
+    return response.data;
+  },
+  
+  createAnnouncement: async (announcementData: any) => {
+    const response = await api.post('/announcements', announcementData);
+    return response.data;
+  },
+  
+  updateAnnouncement: async (id: string, announcementData: any) => {
+    const response = await api.put(`/announcements/${id}`, announcementData);
+    return response.data;
+  },
+  
+  deleteAnnouncement: async (id: string) => {
+    const response = await api.delete(`/announcements/${id}`);
     return response.data;
   },
 };
