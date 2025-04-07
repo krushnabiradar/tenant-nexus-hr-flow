@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Pencil, Trash2, Plus } from "lucide-react";
@@ -25,7 +26,8 @@ const planSchema = z.object({
   price: z.coerce.number().positive({ message: "Price must be positive" }),
   billingCycle: z.enum(["monthly", "quarterly", "yearly"]),
   maxEmployees: z.coerce.number().positive({ message: "Max employees must be positive" }),
-  features: z.string().transform(val => val.split(",").map(item => item.trim())),
+  // Use a string in the form, but transform it to an array for the API
+  featuresString: z.string(),
   isActive: z.boolean().default(true),
   displayOrder: z.coerce.number().int().default(0)
 });
@@ -58,7 +60,7 @@ const BillingPage = () => {
       price: 0,
       billingCycle: "monthly",
       maxEmployees: 0,
-      features: "", // String input that will be transformed
+      featuresString: "", // String input for features
       isActive: true,
       displayOrder: 0
     }
@@ -76,7 +78,7 @@ const BillingPage = () => {
         price: selectedPlan.price,
         billingCycle: selectedPlan.billingCycle,
         maxEmployees: selectedPlan.maxEmployees,
-        features: featuresString, // String for the form input
+        featuresString: featuresString, // String for the form input
         isActive: selectedPlan.isActive,
         displayOrder: selectedPlan.displayOrder
       });
@@ -87,7 +89,7 @@ const BillingPage = () => {
         price: 0,
         billingCycle: "monthly",
         maxEmployees: 0,
-        features: "", // String for the form input
+        featuresString: "", // String for the form input
         isActive: true,
         displayOrder: 0
       });
@@ -97,10 +99,16 @@ const BillingPage = () => {
   // Handle form submission
   const onSubmit = async (values: PlanFormValues) => {
     try {
-      // The features is already transformed to array by zod schema
+      // Convert featuresString to an array for the API
+      const features = values.featuresString.split(',').map(item => item.trim()).filter(item => item !== '');
+      
       const planData = {
-        ...values
+        ...values,
+        features // Override featuresString with the array
       };
+      
+      // Remove featuresString from the data sent to API
+      delete (planData as any).featuresString;
       
       if (isCreating) {
         await subscriptionsAPI.createPlan(planData);
@@ -377,7 +385,7 @@ const BillingPage = () => {
 
                 <FormField
                   control={form.control}
-                  name="features"
+                  name="featuresString"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Features (comma separated)</FormLabel>
