@@ -14,11 +14,6 @@ interface Subscription {
   gracePeriodEnd?: string | Date;
   paymentGateway: 'Stripe' | 'PayPal' | 'Razorpay';
   transactionId?: string;
-  status: 'active' | 'cancelled' | 'pending' | 'past_due';
-  features: string[];
-  name?: string;
-  maxEmployees?: number;
-  planId?: string;
   createdAt: string | Date;
   updatedAt: string | Date;
 }

@@ -16,17 +16,13 @@ const tenantSchema = new mongoose.Schema({
   },
   subscriptionId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Subscription"
+    ref: "Subscription",
+    required: true
   },
   hrManagers: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: "User"
   }],
-  plan: {
-    type: String,
-    enum: ['Free', 'Basic', 'Business', 'Enterprise'],
-    default: 'Free'
-  },
   totalEmployees: {
     type: Number,
     default: 0
@@ -34,7 +30,7 @@ const tenantSchema = new mongoose.Schema({
   status: {
     type: String,
     enum: ['Active', 'Suspended', 'Pending'],
-    default: 'Pending'
+    default: 'Active'
   },
   createdAt: {
     type: Date,

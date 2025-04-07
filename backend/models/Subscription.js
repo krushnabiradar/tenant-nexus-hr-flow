@@ -6,6 +6,7 @@ const subscriptionSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Tenant',
     required: true,
+    unique: true,
     index: true
   },
   plan: {
@@ -20,7 +21,7 @@ const subscriptionSchema = new mongoose.Schema({
   billingCycle: {
     type: String,
     enum: ["Monthly", "Yearly"],
-    default: "Monthly"
+    required: true
   },
   startDate: {
     type: Date,
@@ -54,24 +55,6 @@ const subscriptionSchema = new mongoose.Schema({
   transactionId: {
     type: String,
     unique: true
-  },
-  status: {
-    type: String,
-    enum: ['active', 'cancelled', 'pending', 'past_due'],
-    default: 'pending'
-  },
-  features: {
-    type: [String],
-    default: []
-  },
-  name: {
-    type: String
-  },
-  maxEmployees: {
-    type: Number
-  },
-  planId: {
-    type: String
   },
   createdAt: {
     type: Date,

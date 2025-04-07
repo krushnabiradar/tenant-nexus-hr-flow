@@ -4,7 +4,12 @@ const mongoose = require('mongoose');
 const leaveSchema = new mongoose.Schema({
   employeeId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    ref: 'Employee',
+    required: true
+  },
+  leaveType: {
+    type: String,
+    enum: ['Sick Leave', 'Casual Leave', 'Annual Leave', 'Maternity Leave'],
     required: true
   },
   startDate: {
@@ -15,18 +20,8 @@ const leaveSchema = new mongoose.Schema({
     type: Date,
     required: true
   },
-  numberOfDays: {
-    type: Number,
-    required: true
-  },
   reason: {
-    type: String,
-    required: true
-  },
-  type: {
-    type: String,
-    enum: ['Casual', 'Sick', 'Annual', 'Unpaid'],
-    required: true
+    type: String
   },
   status: {
     type: String,
@@ -37,14 +32,6 @@ const leaveSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
   },
-  comments: {
-    type: String
-  },
-  tenantId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Tenant',
-    required: true
-  },
   createdAt: {
     type: Date,
     default: Date.now
@@ -53,7 +40,9 @@ const leaveSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   }
-});
+}, { timestamps: true });
+
+leaveSchema.index({ employeeId: 1, status: 1 });
 
 const Leave = mongoose.model('Leave', leaveSchema);
 

@@ -4,8 +4,7 @@ interface Tenant {
   _id?: string;
   name: string;
   domain: string;
-  plan: string;
-  subscriptionId?: string;
+  subscriptionId: string;
   hrManagers?: string[];
   totalEmployees: number;
   status: 'Active' | 'Suspended' | 'Pending';

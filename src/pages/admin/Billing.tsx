@@ -26,7 +26,6 @@ const planSchema = z.object({
   price: z.coerce.number().positive({ message: "Price must be positive" }),
   billingCycle: z.enum(["monthly", "quarterly", "yearly"]),
   maxEmployees: z.coerce.number().positive({ message: "Max employees must be positive" }),
-  // Change this to accept a string and transform it to an array
   features: z.string().transform(val => val.split(",").map(item => item.trim())),
   isActive: z.boolean().default(true),
   displayOrder: z.coerce.number().int().default(0)
@@ -51,7 +50,7 @@ const BillingPage = () => {
     queryFn: () => subscriptionsAPI.getAllSubscriptions()
   });
 
-  // Form setup
+  // Form setup with proper typing for features as string
   const form = useForm<PlanFormValues>({
     resolver: zodResolver(planSchema),
     defaultValues: {
@@ -60,7 +59,7 @@ const BillingPage = () => {
       price: 0,
       billingCycle: "monthly",
       maxEmployees: 0,
-      features: "", // String that will be transformed to array on submit
+      features: "", // This is a string input that will be transformed to array on submit
       isActive: true,
       displayOrder: 0
     }
@@ -78,7 +77,7 @@ const BillingPage = () => {
         price: selectedPlan.price,
         billingCycle: selectedPlan.billingCycle,
         maxEmployees: selectedPlan.maxEmployees,
-        features: featuresString, // This is now correct - a string
+        features: featuresString, // This is a string for the form input
         isActive: selectedPlan.isActive,
         displayOrder: selectedPlan.displayOrder
       });
@@ -89,7 +88,7 @@ const BillingPage = () => {
         price: 0,
         billingCycle: "monthly",
         maxEmployees: 0,
-        features: "", // String that will be transformed to array on submit
+        features: "", // This is a string for the form input
         isActive: true,
         displayOrder: 0
       });
@@ -99,7 +98,7 @@ const BillingPage = () => {
   // Handle form submission
   const onSubmit = async (values: PlanFormValues) => {
     try {
-      // Features is already transformed to array by zod schema
+      // Features is transformed to array by zod schema
       const planData = {
         ...values
       };
@@ -260,7 +259,7 @@ const BillingPage = () => {
                             <div className="font-medium">{sub.tenantId?.name || 'Unknown'}</div>
                             <div className="text-sm text-gray-500">{sub.tenantId?.domain || 'Unknown'}</div>
                           </TableCell>
-                          <TableCell>{sub.name}</TableCell>
+                          <TableCell>{sub.plan}</TableCell>
                           <TableCell>${sub.price.toFixed(2)} / {sub.billingCycle}</TableCell>
                           <TableCell>{new Date(sub.startDate).toLocaleDateString()}</TableCell>
                           <TableCell>
@@ -268,12 +267,11 @@ const BillingPage = () => {
                           </TableCell>
                           <TableCell>
                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                              sub.status === 'active' ? 'bg-green-100 text-green-800' : 
-                              sub.status === 'cancelled' ? 'bg-red-100 text-red-800' :
-                              sub.status === 'past_due' ? 'bg-yellow-100 text-yellow-800' :
-                              'bg-gray-100 text-gray-800'
+                              sub.paymentStatus === 'Paid' ? 'bg-green-100 text-green-800' : 
+                              sub.paymentStatus === 'Failed' ? 'bg-red-100 text-red-800' :
+                              'bg-yellow-100 text-yellow-800'
                             }`}>
-                              {sub.status}
+                              {sub.paymentStatus}
                             </span>
                           </TableCell>
                         </TableRow>

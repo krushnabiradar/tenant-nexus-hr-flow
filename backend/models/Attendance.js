@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const attendanceSchema = new mongoose.Schema({
   employeeId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    ref: 'Employee',
     required: true
   },
   date: {
@@ -12,22 +12,20 @@ const attendanceSchema = new mongoose.Schema({
     required: true
   },
   clockIn: {
-    type: Date,
+    type: String,
     required: true
   },
   clockOut: {
-    type: Date
-  },
-  hoursWorked: {
-    type: Number
-  },
-  notes: {
     type: String
   },
-  tenantId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Tenant',
-    required: true
+  status: {
+    type: String,
+    enum: ['Present', 'Absent', 'On Leave', 'Late'],
+    default: 'Present'
+  },
+  overtimeHours: {
+    type: Number,
+    default: 0
   },
   createdAt: {
     type: Date,
@@ -37,7 +35,9 @@ const attendanceSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   }
-});
+}, { timestamps: true });
+
+attendanceSchema.index({ employeeId: 1, date: -1 });
 
 const Attendance = mongoose.model('Attendance', attendanceSchema);
 

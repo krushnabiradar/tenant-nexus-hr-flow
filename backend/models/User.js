@@ -3,6 +3,18 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
+  tenantId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Tenant',
+    required: function() {
+      return this.role !== 'SuperAdmin';
+    },
+    index: true
+  },
+  name: {
+    type: String,
+    required: true
+  },
   email: {
     type: String,
     required: true,
@@ -16,26 +28,21 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['admin', 'company', 'employee', 'manager', 'finance', 'compliance', 'recruitment'],
+    enum: ['SuperAdmin', 'HR', 'Manager', 'Employee'],
     required: true
   },
-  name: {
-    type: String,
-    required: true
+  permissions: {
+    type: [String],
+    default: []
   },
-  tenantId: {
+  employeeProfile: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Tenant',
-    required: function() {
-      return this.role !== 'admin';
-    }
+    ref: 'Employee'
   },
-  isActive: {
-    type: Boolean,
-    default: true
-  },
-  lastLogin: {
-    type: Date
+  status: {
+    type: String,
+    enum: ['Active', 'Inactive'],
+    default: 'Active'
   },
   createdAt: {
     type: Date,
@@ -45,7 +52,9 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   }
-});
+}, { timestamps: true });
+
+userSchema.index({ tenantId: 1, role: 1 });
 
 // Pre-save hook to hash password
 userSchema.pre('save', async function(next) {
