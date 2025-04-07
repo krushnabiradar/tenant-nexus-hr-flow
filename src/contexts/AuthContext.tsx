@@ -1,5 +1,6 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { authAPI } from "@/services/api";
 
 // Define types for user and context
 type User = {
@@ -21,9 +22,10 @@ type Tenant = {
 type AuthContextType = {
   user: User | null;
   tenant: Tenant | null;
-  login: (user: User, tenant?: Tenant) => void;
+  login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   isAuthenticated: boolean;
+  isLoading: boolean;
 };
 
 // Create context
@@ -34,49 +36,75 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [tenant, setTenant] = useState<Tenant | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    // Check if user is stored in localStorage on mount
-    const storedUser = localStorage.getItem("user");
-    const storedTenant = localStorage.getItem("tenant");
+    // Check if token exists in localStorage on mount
+    const token = localStorage.getItem("token");
     
-    if (storedUser) {
-      const parsedUser = JSON.parse(storedUser);
-      setUser(parsedUser);
-      setIsAuthenticated(parsedUser.isAuthenticated);
-    }
-    
-    if (storedTenant) {
-      try {
-        const parsedTenant = JSON.parse(storedTenant);
-        setTenant(parsedTenant);
-      } catch (error) {
-        console.error("Error parsing tenant data:", error);
-      }
+    if (token) {
+      // Verify the token and get current user data
+      const fetchCurrentUser = async () => {
+        try {
+          const { user: userData, tenant: tenantData } = await authAPI.getCurrentUser();
+          
+          if (userData) {
+            setUser(userData);
+            setIsAuthenticated(true);
+            
+            if (tenantData) {
+              setTenant(tenantData);
+            }
+          } else {
+            // Token is invalid or expired
+            localStorage.removeItem("token");
+          }
+        } catch (error) {
+          console.error("Error fetching current user:", error);
+          localStorage.removeItem("token");
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      
+      fetchCurrentUser();
+    } else {
+      setIsLoading(false);
     }
   }, []);
 
-  const login = (userData: User, tenantData?: Tenant) => {
-    localStorage.setItem("user", JSON.stringify(userData));
-    setUser(userData);
-    setIsAuthenticated(true);
-    
-    if (tenantData) {
-      localStorage.setItem("tenant", JSON.stringify(tenantData));
-      setTenant(tenantData);
+  const login = async (email: string, password: string) => {
+    try {
+      const { token, user: userData, tenant: tenantData } = await authAPI.login(email, password);
+      
+      // Store token
+      localStorage.setItem("token", token);
+      
+      // Set user and auth state
+      setUser(userData);
+      setIsAuthenticated(true);
+      
+      // Set tenant if available
+      if (tenantData) {
+        setTenant(tenantData);
+      }
+      
+      return userData;
+    } catch (error) {
+      console.error("Login error:", error);
+      throw error;
     }
   };
 
   const logout = () => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("tenant");
+    localStorage.removeItem("token");
     setUser(null);
     setTenant(null);
     setIsAuthenticated(false);
   };
 
   return (
-    <AuthContext.Provider value={{ user, tenant, login, logout, isAuthenticated }}>
+    <AuthContext.Provider value={{ user, tenant, login, logout, isAuthenticated, isLoading }}>
       {children}
     </AuthContext.Provider>
   );

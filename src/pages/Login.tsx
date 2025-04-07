@@ -17,71 +17,7 @@ const Login = () => {
   const [loginPassword, setLoginPassword] = useState("");
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   
-  // Mock data for roles - in a real app, this would come from an API/backend
-  const mockUsers = [
-    { 
-      email: "admin@example.com", 
-      password: "password", 
-      role: "admin", 
-      name: "Admin User" 
-    },
-    { 
-      email: "company@example.com", 
-      password: "password", 
-      role: "company", 
-      name: "Company Admin",
-      tenantId: "tenant1" 
-    },
-    { 
-      email: "employee@example.com", 
-      password: "password", 
-      role: "employee", 
-      name: "John Employee",
-      tenantId: "tenant1" 
-    },
-    { 
-      email: "manager@example.com", 
-      password: "password", 
-      role: "manager", 
-      name: "Sarah Manager",
-      tenantId: "tenant1" 
-    },
-    { 
-      email: "finance@example.com", 
-      password: "password", 
-      role: "finance", 
-      name: "Finance User",
-      tenantId: "tenant1" 
-    },
-    { 
-      email: "compliance@example.com", 
-      password: "password", 
-      role: "compliance", 
-      name: "Compliance User",
-      tenantId: "tenant1" 
-    },
-    { 
-      email: "recruitment@example.com", 
-      password: "password", 
-      role: "recruitment", 
-      name: "Recruitment User",
-      tenantId: "tenant1" 
-    },
-  ];
-
-  // Mock tenant data - in a real app, this would come from an API/backend
-  const mockTenants = [
-    {
-      id: "tenant1",
-      name: "Acme Corporation",
-      domain: "acme.com",
-      plan: "Business",
-      totalEmployees: 45,
-      status: "Active" as const
-    }
-  ];
-  
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoggingIn(true);
     
@@ -92,63 +28,42 @@ const Login = () => {
       return;
     }
     
-    // Mock authentication - in a real app, this would be an API call
-    setTimeout(() => {
-      const user = mockUsers.find(
-        (user) => user.email === loginEmail && user.password === loginPassword
-      );
+    try {
+      const user = await login(loginEmail, loginPassword);
       
-      if (user) {
-        // Create the user object to store
-        const userObj = {
-          email: user.email,
-          role: user.role,
-          name: user.name,
-          tenantId: user.tenantId,
-          isAuthenticated: true
-        };
-        
-        // Find tenant if applicable
-        const tenant = user.tenantId ? 
-          mockTenants.find(t => t.id === user.tenantId) || null : null;
-        
-        // Store user and tenant
-        login(userObj, tenant || undefined);
-        
-        toast.success("Login successful!");
-        
-        // Redirect based on role
-        switch (user.role) {
-          case "admin":
-            navigate("/admin");
-            break;
-          case "company":
-            navigate("/company");
-            break;
-          case "employee":
-            navigate("/employee");
-            break;
-          case "manager":
-            navigate("/manager");
-            break;
-          case "finance":
-            navigate("/finance");
-            break;
-          case "compliance":
-            navigate("/compliance");
-            break;
-          case "recruitment":
-            navigate("/recruitment");
-            break;
-          default:
-            navigate("/");
-        }
-      } else {
-        toast.error("Invalid email or password");
+      toast.success("Login successful!");
+      
+      // Redirect based on role
+      switch (user.role) {
+        case "admin":
+          navigate("/admin");
+          break;
+        case "company":
+          navigate("/company");
+          break;
+        case "employee":
+          navigate("/employee");
+          break;
+        case "manager":
+          navigate("/manager");
+          break;
+        case "finance":
+          navigate("/finance");
+          break;
+        case "compliance":
+          navigate("/compliance");
+          break;
+        case "recruitment":
+          navigate("/recruitment");
+          break;
+        default:
+          navigate("/");
       }
-      
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Invalid email or password");
+    } finally {
       setIsLoggingIn(false);
-    }, 1000);
+    }
   };
   
   return (
