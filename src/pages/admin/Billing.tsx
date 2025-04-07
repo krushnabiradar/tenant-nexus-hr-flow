@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Pencil, Trash2, Plus } from "lucide-react";
@@ -98,10 +97,9 @@ const BillingPage = () => {
   // Handle form submission
   const onSubmit = async (values: PlanFormValues) => {
     try {
-      // Ensure features is an array before submitting
+      // Features is already transformed to array by zod schema
       const planData = {
-        ...values,
-        features: Array.isArray(values.features) ? values.features : values.features.split(',').map(f => f.trim())
+        ...values
       };
       
       if (isCreating) {

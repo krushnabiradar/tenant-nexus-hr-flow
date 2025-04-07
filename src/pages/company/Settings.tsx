@@ -18,7 +18,7 @@ const SettingsPage = () => {
     queryKey: ['tenant', user?.tenantId],
     queryFn: () => tenantsAPI.getTenantById(user?.tenantId),
     enabled: !!user?.tenantId,
-    onSuccess: (data) => {
+    onSuccess: (data: Tenant) => {
       setTenantData(data);
     }
   });
@@ -26,9 +26,9 @@ const SettingsPage = () => {
   // Fetch subscription data if tenant is loaded
   const { data: subscriptionData, isLoading: loadingSubscription } = useQuery({
     queryKey: ['subscription', tenantData?.id],
-    queryFn: () => subscriptionsAPI.getSubscriptionByTenant(tenantData?.id),
+    queryFn: () => subscriptionsAPI.getSubscriptionByTenant(tenantData?.id as string),
     enabled: !!tenantData?.id,
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       setSubscription(data);
     },
     onError: () => {
