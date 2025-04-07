@@ -22,28 +22,30 @@ const SettingsPage = () => {
 
   // Fetch current subscription if tenant exists
   const { data: subscription, isLoading: loadingSubscription, refetch: refetchSubscription } = useQuery({
-    queryKey: ['current-subscription', tenant?._id],
-    queryFn: () => subscriptionsAPI.getSubscriptionByTenant(tenant?._id || ''),
-    enabled: !!tenant?._id,
-    onSuccess: (data) => {
-      setCurrentSubscription(data);
-    },
-    onError: () => {
-      // Subscription might not exist yet, which is fine
-      setCurrentSubscription(null);
+    queryKey: ['current-subscription', tenant?.id],
+    queryFn: () => subscriptionsAPI.getSubscriptionByTenant(tenant?.id || ''),
+    enabled: !!tenant?.id,
+    meta: {
+      onSuccess: (data: any) => {
+        setCurrentSubscription(data);
+      },
+      onError: () => {
+        // Subscription might not exist yet, which is fine
+        setCurrentSubscription(null);
+      }
     }
   });
 
   // Handle subscription purchase
   const handleSubscribe = async (planId: string) => {
     try {
-      if (!tenant?._id) {
+      if (!tenant?.id) {
         toast.error("Tenant information not available");
         return;
       }
 
       await subscriptionsAPI.subscribeTenant({
-        tenantId: tenant._id,
+        tenantId: tenant.id,
         planId,
         paymentMethod: "credit_card" // This would be replaced with actual payment integration
       });

@@ -68,13 +68,16 @@ const BillingPage = () => {
   // Set form values when editing a plan
   useEffect(() => {
     if (selectedPlan) {
+      // Convert the features array to a string for the form
+      const featuresString = selectedPlan.features ? selectedPlan.features.join(", ") : "";
+      
       form.reset({
         name: selectedPlan.name,
         description: selectedPlan.description,
         price: selectedPlan.price,
         billingCycle: selectedPlan.billingCycle,
         maxEmployees: selectedPlan.maxEmployees,
-        features: selectedPlan.features.join(", "),
+        features: featuresString,
         isActive: selectedPlan.isActive,
         displayOrder: selectedPlan.displayOrder
       });

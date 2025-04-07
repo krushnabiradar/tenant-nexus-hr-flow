@@ -38,6 +38,16 @@ const tenantSchema = new mongoose.Schema({
   }
 });
 
+// Make sure virtual id is included
+tenantSchema.set('toJSON', {
+  virtuals: true,
+  versionKey: false,
+  transform: function (doc, ret) {
+    ret.id = ret._id;
+    return ret;
+  }
+});
+
 const Tenant = mongoose.model('Tenant', tenantSchema);
 
 module.exports = Tenant;
