@@ -9,6 +9,7 @@ const tenantRoutes = require('./routes/tenant.routes');
 const leaveRoutes = require('./routes/leave.routes');
 const attendanceRoutes = require('./routes/attendance.routes');
 const announcementRoutes = require('./routes/announcement.routes');
+const subscriptionRoutes = require('./routes/subscription.routes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -29,6 +30,7 @@ app.use('/api/tenants', tenantRoutes);
 app.use('/api/leaves', leaveRoutes);
 app.use('/api/attendance', attendanceRoutes);
 app.use('/api/announcements', announcementRoutes);
+app.use('/api/subscriptions', subscriptionRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {

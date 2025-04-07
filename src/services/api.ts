@@ -195,4 +195,52 @@ export const announcementsAPI = {
   },
 };
 
+// Subscriptions API calls
+export const subscriptionsAPI = {
+  getAllPlans: async () => {
+    const response = await api.get('/subscriptions/plans');
+    return response.data;
+  },
+  
+  getPlanById: async (id: string) => {
+    const response = await api.get(`/subscriptions/plans/${id}`);
+    return response.data;
+  },
+  
+  createPlan: async (planData: any) => {
+    const response = await api.post('/subscriptions/plans', planData);
+    return response.data;
+  },
+  
+  updatePlan: async (id: string, planData: any) => {
+    const response = await api.put(`/subscriptions/plans/${id}`, planData);
+    return response.data;
+  },
+  
+  deletePlan: async (id: string) => {
+    const response = await api.delete(`/subscriptions/plans/${id}`);
+    return response.data;
+  },
+  
+  subscribeTenant: async (subscriptionData: any) => {
+    const response = await api.post('/subscriptions', subscriptionData);
+    return response.data;
+  },
+  
+  getSubscriptionByTenant: async (tenantId: string) => {
+    const response = await api.get(`/subscriptions/tenant/${tenantId}`);
+    return response.data;
+  },
+  
+  cancelSubscription: async (subscriptionId: string) => {
+    const response = await api.put(`/subscriptions/${subscriptionId}/cancel`);
+    return response.data;
+  },
+  
+  getAllSubscriptions: async (params?: { status?: string; plan?: string }) => {
+    const response = await api.get('/subscriptions', { params });
+    return response.data;
+  },
+};
+
 export default api;
