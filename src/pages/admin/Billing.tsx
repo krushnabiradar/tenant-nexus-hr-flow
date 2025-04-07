@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Pencil, Trash2, Plus } from "lucide-react";
@@ -34,7 +35,7 @@ type PlanFormValues = z.infer<typeof planSchema>;
 
 const BillingPage = () => {
   const [isCreating, setIsCreating] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState<any>(null);
+  const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(null);
   const [openDialog, setOpenDialog] = useState(false);
 
   // Query to fetch subscription plans
@@ -106,7 +107,7 @@ const BillingPage = () => {
         await subscriptionsAPI.createPlan(planData);
         toast.success("Subscription plan created successfully");
       } else {
-        await subscriptionsAPI.updatePlan(selectedPlan.id, planData);
+        await subscriptionsAPI.updatePlan(selectedPlan!.id, planData);
         toast.success("Subscription plan updated successfully");
       }
       
@@ -133,7 +134,7 @@ const BillingPage = () => {
   };
 
   // Handle opening the create/edit dialog
-  const handleOpenDialog = (plan: any = null) => {
+  const handleOpenDialog = (plan: SubscriptionPlan | null = null) => {
     if (plan) {
       setIsCreating(false);
       setSelectedPlan(plan);

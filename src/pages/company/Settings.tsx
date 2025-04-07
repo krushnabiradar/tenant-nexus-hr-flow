@@ -11,15 +11,17 @@ import { toast } from "sonner";
 const SettingsPage = () => {
   const { user } = useAuth();
   const [tenantData, setTenantData] = useState<Tenant | null>(null);
-  const [subscription, setSubscription] = useState<any>(null);
+  const [subscription, setSubscription] = useState<Subscription | null>(null);
 
   // Fetch tenant data
   const { data: tenant, isLoading: loadingTenant } = useQuery({
     queryKey: ['tenant', user?.tenantId],
     queryFn: () => tenantsAPI.getTenantById(user?.tenantId),
     enabled: !!user?.tenantId,
-    onSuccess: (data: Tenant) => {
-      setTenantData(data);
+    meta: {
+      onSuccess: (data: Tenant) => {
+        setTenantData(data);
+      }
     }
   });
 
@@ -28,12 +30,14 @@ const SettingsPage = () => {
     queryKey: ['subscription', tenantData?.id],
     queryFn: () => subscriptionsAPI.getSubscriptionByTenant(tenantData?.id as string),
     enabled: !!tenantData?.id,
-    onSuccess: (data: any) => {
-      setSubscription(data);
-    },
-    onError: () => {
-      // It's okay if there's no subscription
-      console.log("No subscription found for tenant");
+    meta: {
+      onSuccess: (data: Subscription) => {
+        setSubscription(data);
+      },
+      onError: () => {
+        // It's okay if there's no subscription
+        console.log("No subscription found for tenant");
+      }
     }
   });
 
