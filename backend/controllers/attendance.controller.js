@@ -228,8 +228,8 @@ exports.getEmployeeAttendanceStats = async (req, res) => {
     
     if (month && year) {
       // If month and year provided, get stats for that month
-      startDate = new Date(parseInt(year as string), parseInt(month as string) - 1, 1);
-      endDate = new Date(parseInt(year as string), parseInt(month as string), 0);
+      startDate = new Date(parseInt(year), parseInt(month) - 1, 1);
+      endDate = new Date(parseInt(year), parseInt(month), 0);
     } else {
       // Default to current month
       const now = new Date();
