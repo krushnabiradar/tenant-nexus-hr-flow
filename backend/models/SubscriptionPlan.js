@@ -46,6 +46,16 @@ const subscriptionPlanSchema = new mongoose.Schema({
   }
 });
 
+// Add virtual id field
+subscriptionPlanSchema.set('toJSON', {
+  virtuals: true,
+  versionKey: false,
+  transform: function (doc, ret) {
+    ret.id = ret._id;
+    return ret;
+  }
+});
+
 const SubscriptionPlan = mongoose.model('SubscriptionPlan', subscriptionPlanSchema);
 
 module.exports = SubscriptionPlan;

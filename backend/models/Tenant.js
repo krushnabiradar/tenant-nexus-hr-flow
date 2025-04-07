@@ -14,6 +14,14 @@ const tenantSchema = new mongoose.Schema({
     trim: true,
     lowercase: true
   },
+  subscriptionId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Subscription"
+  },
+  hrManagers: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User"
+  }],
   plan: {
     type: String,
     enum: ['Free', 'Basic', 'Business', 'Enterprise'],
@@ -36,7 +44,7 @@ const tenantSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   }
-});
+}, { timestamps: true });
 
 // Make sure virtual id is included
 tenantSchema.set('toJSON', {
@@ -47,6 +55,8 @@ tenantSchema.set('toJSON', {
     return ret;
   }
 });
+
+tenantSchema.index({ domain: 1 });
 
 const Tenant = mongoose.model('Tenant', tenantSchema);
 
