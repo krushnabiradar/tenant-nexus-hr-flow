@@ -45,18 +45,20 @@ const employeeSchema = new mongoose.Schema({
   },
   exitDate: {
     type: Date
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now
   }
 }, { timestamps: true });
 
 employeeSchema.index({ tenantId: 1, department: 1 });
+
+// Make sure virtual id is included
+employeeSchema.set('toJSON', {
+  virtuals: true,
+  versionKey: false,
+  transform: function (doc, ret) {
+    ret.id = ret._id;
+    return ret;
+  }
+});
 
 const Employee = mongoose.model('Employee', employeeSchema);
 

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Pencil, Trash2, Plus } from "lucide-react";
@@ -19,7 +18,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { subscriptionsAPI } from "@/services/api";
 
-// Define the schema for the subscription plan form
+// Define the schema for the subscription plan form with proper handling for features
 const planSchema = z.object({
   name: z.string().min(3, { message: "Name must be at least 3 characters" }),
   description: z.string().min(10, { message: "Description must be at least 10 characters" }),
@@ -59,7 +58,7 @@ const BillingPage = () => {
       price: 0,
       billingCycle: "monthly",
       maxEmployees: 0,
-      features: "", // This is a string input that will be transformed to array on submit
+      features: "", // String input that will be transformed
       isActive: true,
       displayOrder: 0
     }
@@ -77,7 +76,7 @@ const BillingPage = () => {
         price: selectedPlan.price,
         billingCycle: selectedPlan.billingCycle,
         maxEmployees: selectedPlan.maxEmployees,
-        features: featuresString, // This is a string for the form input
+        features: featuresString, // String for the form input
         isActive: selectedPlan.isActive,
         displayOrder: selectedPlan.displayOrder
       });
@@ -88,7 +87,7 @@ const BillingPage = () => {
         price: 0,
         billingCycle: "monthly",
         maxEmployees: 0,
-        features: "", // This is a string for the form input
+        features: "", // String for the form input
         isActive: true,
         displayOrder: 0
       });
@@ -98,7 +97,7 @@ const BillingPage = () => {
   // Handle form submission
   const onSubmit = async (values: PlanFormValues) => {
     try {
-      // Features is transformed to array by zod schema
+      // The features is already transformed to array by zod schema
       const planData = {
         ...values
       };

@@ -31,14 +31,6 @@ const tenantSchema = new mongoose.Schema({
     type: String,
     enum: ['Active', 'Suspended', 'Pending'],
     default: 'Active'
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now
   }
 }, { timestamps: true });
 

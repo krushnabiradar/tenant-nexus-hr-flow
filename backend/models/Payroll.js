@@ -41,18 +41,20 @@ const payrollSchema = new mongoose.Schema({
   transactionId: {
     type: String,
     unique: true
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now
   }
 }, { timestamps: true });
 
 payrollSchema.index({ tenantId: 1, month: 1 });
+
+// Make sure virtual id is included
+payrollSchema.set('toJSON', {
+  virtuals: true,
+  versionKey: false,
+  transform: function (doc, ret) {
+    ret.id = ret._id;
+    return ret;
+  }
+});
 
 const Payroll = mongoose.model('Payroll', payrollSchema);
 

@@ -26,18 +26,20 @@ const attendanceSchema = new mongoose.Schema({
   overtimeHours: {
     type: Number,
     default: 0
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now
   }
 }, { timestamps: true });
 
 attendanceSchema.index({ employeeId: 1, date: -1 });
+
+// Make sure virtual id is included
+attendanceSchema.set('toJSON', {
+  virtuals: true,
+  versionKey: false,
+  transform: function (doc, ret) {
+    ret.id = ret._id;
+    return ret;
+  }
+});
 
 const Attendance = mongoose.model('Attendance', attendanceSchema);
 

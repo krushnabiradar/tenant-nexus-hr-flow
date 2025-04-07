@@ -31,18 +31,20 @@ const leaveSchema = new mongoose.Schema({
   approvedBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now
   }
 }, { timestamps: true });
 
 leaveSchema.index({ employeeId: 1, status: 1 });
+
+// Make sure virtual id is included
+leaveSchema.set('toJSON', {
+  virtuals: true,
+  versionKey: false,
+  transform: function (doc, ret) {
+    ret.id = ret._id;
+    return ret;
+  }
+});
 
 const Leave = mongoose.model('Leave', leaveSchema);
 

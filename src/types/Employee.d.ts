@@ -8,7 +8,7 @@ interface Employee {
   department: string;
   managerId?: string | Employee;
   salary: number;
-  payrollId?: string;
+  payrollId?: string | Payroll;
   employmentStatus: 'Active' | 'On Leave' | 'Resigned' | 'Terminated';
   joinDate: string | Date;
   exitDate?: string | Date;
