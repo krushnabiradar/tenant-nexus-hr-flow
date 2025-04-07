@@ -69,7 +69,7 @@ const BillingPage = () => {
   useEffect(() => {
     if (selectedPlan) {
       // Convert the features array to a string for the form
-      const featuresString = selectedPlan.features ? selectedPlan.features.join(", ") : "";
+      const featuresString = Array.isArray(selectedPlan.features) ? selectedPlan.features.join(", ") : "";
       
       form.reset({
         name: selectedPlan.name,
@@ -98,11 +98,17 @@ const BillingPage = () => {
   // Handle form submission
   const onSubmit = async (values: PlanFormValues) => {
     try {
+      // Ensure features is an array before submitting
+      const planData = {
+        ...values,
+        features: Array.isArray(values.features) ? values.features : values.features.split(',').map(f => f.trim())
+      };
+      
       if (isCreating) {
-        await subscriptionsAPI.createPlan(values);
+        await subscriptionsAPI.createPlan(planData);
         toast.success("Subscription plan created successfully");
       } else {
-        await subscriptionsAPI.updatePlan(selectedPlan._id, values);
+        await subscriptionsAPI.updatePlan(selectedPlan.id, planData);
         toast.success("Subscription plan updated successfully");
       }
       
