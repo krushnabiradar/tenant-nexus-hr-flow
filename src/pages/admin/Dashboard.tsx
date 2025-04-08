@@ -6,48 +6,54 @@ import StatsCard from "@/components/dashboard/widgets/StatsCard";
 import RecentCompanies from "@/components/dashboard/widgets/RecentCompanies";
 import SystemActivity from "@/components/dashboard/widgets/SystemActivity";
 import PerformanceChart from "@/components/dashboard/widgets/PerformanceChart";
-import api from "@/services/api";
+import { adminApi } from "@/services/admin.api";
 import { useToast } from "@/hooks/use-toast";
 
 const AdminDashboard = () => {
-  const [dashboardData, setDashboardData] = useState<any>(null);
+  const [stats, setStats] = useState<any>(null);
+  const [performanceData, setPerformanceData] = useState<any>(null);
+  const [activityData, setActivityData] = useState<any>(null);
+  const [recentCompanies, setRecentCompanies] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        setIsLoading(true);
-        const response = await api.get('/admin/dashboard');
-        setDashboardData(response.data);
-      } catch (error) {
-        console.error("Failed to fetch admin dashboard data:", error);
-        toast({
-          title: "Error",
-          description: "Failed to load dashboard data. Please try again later.",
-          variant: "destructive"
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const fetchDashboardData = async () => {
+    try {
+      setIsLoading(true);
+      
+      // Fetch all required data in parallel
+      const [statsData, performData, activityResult, companiesData] = await Promise.all([
+        adminApi.getStats(),
+        adminApi.getPerformanceData(),
+        adminApi.getSystemActivity(),
+        adminApi.getRecentCompanies()
+      ]);
+      
+      setStats(statsData);
+      setPerformanceData(performData);
+      setActivityData(activityResult);
+      setRecentCompanies(companiesData);
+    } catch (error) {
+      console.error("Failed to fetch admin dashboard data:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load dashboard data. Please try again later.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchDashboardData();
   }, [toast]);
-
-  // Default values if API isn't ready
-  const stats = dashboardData?.stats || {
-    totalCompanies: { value: "124", trend: { value: 12, isPositive: true } },
-    totalEmployees: { value: "3,865", trend: { value: 8, isPositive: true } },
-    apiRequests: { value: "268,492", trend: { value: 5, isPositive: true } },
-    monthlyRevenue: { value: "$42,850", trend: { value: 2, isPositive: false } }
-  };
 
   if (isLoading) {
     return (
       <DashboardLayout>
         <div className="flex items-center justify-center h-96">
-          <p className="text-lg text-gray-500">Loading dashboard data...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-hrms-blue"></div>
         </div>
       </DashboardLayout>
     );
@@ -58,44 +64,44 @@ const AdminDashboard = () => {
       <div className="space-y-6">
         <h2 className="text-2xl font-bold tracking-tight">Dashboard Overview</h2>
         
-        <div className="dashboard-grid">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatsCard
             title="Total Companies"
-            value={stats.totalCompanies.value}
+            value={stats?.totalCompanies?.value || "0"}
             icon={<Building className="h-6 w-6" />}
-            trend={stats.totalCompanies.trend}
+            trend={stats?.totalCompanies?.trend || { value: 0, isPositive: true }}
           />
           <StatsCard
             title="Total Employees"
-            value={stats.totalEmployees.value}
+            value={stats?.totalEmployees?.value || "0"}
             icon={<Users className="h-6 w-6" />}
-            trend={stats.totalEmployees.trend}
+            trend={stats?.totalEmployees?.trend || { value: 0, isPositive: true }}
           />
           <StatsCard
             title="API Requests"
-            value={stats.apiRequests.value}
+            value={stats?.apiRequests?.value || "0"}
             icon={<BarChart3 className="h-6 w-6" />}
-            trend={stats.apiRequests.trend}
+            trend={stats?.apiRequests?.trend || { value: 0, isPositive: true }}
           />
           <StatsCard
             title="Monthly Revenue"
-            value={stats.monthlyRevenue.value}
+            value={stats?.monthlyRevenue?.value || "$0"}
             icon={<CreditCard className="h-6 w-6" />}
-            trend={stats.monthlyRevenue.trend}
+            trend={stats?.monthlyRevenue?.trend || { value: 0, isPositive: true }}
           />
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
-            <PerformanceChart chartData={dashboardData?.performanceData} />
+            <PerformanceChart chartData={performanceData} />
           </div>
           <div>
-            <SystemActivity activityData={dashboardData?.activityData} />
+            <SystemActivity activityData={activityData} />
           </div>
         </div>
         
         <div className="mt-6">
-          <RecentCompanies companies={dashboardData?.recentCompanies} />
+          <RecentCompanies companies={recentCompanies} />
         </div>
       </div>
     </DashboardLayout>
