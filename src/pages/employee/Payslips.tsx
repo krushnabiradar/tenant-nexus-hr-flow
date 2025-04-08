@@ -1,18 +1,68 @@
 
+import { useState, useEffect } from "react";
 import EmployeeDashboardLayout from "@/layouts/EmployeeDashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CreditCard, Download, Eye, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import { format } from "date-fns";
 
 const PayslipsPage = () => {
-  const payslips = [
-    { id: 1, month: "March 2025", amount: "$4,850.00", date: "April 1, 2025" },
-    { id: 2, month: "February 2025", amount: "$4,850.00", date: "March 1, 2025" },
-    { id: 3, month: "January 2025", amount: "$4,850.00", date: "February 1, 2025" },
-    { id: 4, month: "December 2024", amount: "$4,700.00", date: "January 1, 2025" },
-    { id: 5, month: "November 2024", amount: "$4,700.00", date: "December 1, 2024" },
-    { id: 6, month: "October 2024", amount: "$4,700.00", date: "November 1, 2024" },
-  ];
+  const [payslips, setPayslips] = useState<any[]>([]);
+  const [currentPayslip, setCurrentPayslip] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+
+  // TODO: Replace with actual API call when available
+  useEffect(() => {
+    const fetchPayslips = async () => {
+      setIsLoading(true);
+      try {
+        // This would be replaced with an actual API call
+        // Example: const response = await payrollAPI.getEmployeePayslips(userId);
+        
+        // Mock data until payroll API is available
+        const mockPayslips = [
+          { id: 1, month: "March 2025", amount: "$4,850.00", date: "April 1, 2025" },
+          { id: 2, month: "February 2025", amount: "$4,850.00", date: "March 1, 2025" },
+          { id: 3, month: "January 2025", amount: "$4,850.00", date: "February 1, 2025" },
+          { id: 4, month: "December 2024", amount: "$4,700.00", date: "January 1, 2025" },
+          { id: 5, month: "November 2024", amount: "$4,700.00", date: "December 1, 2024" },
+          { id: 6, month: "October 2024", amount: "$4,700.00", date: "November 1, 2024" },
+        ];
+        
+        setPayslips(mockPayslips);
+        setCurrentPayslip(mockPayslips[0]);
+      } catch (error) {
+        console.error("Error fetching payslips:", error);
+        toast({
+          title: "Error",
+          description: "Failed to fetch payroll data",
+          variant: "destructive"
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPayslips();
+  }, [toast]);
+
+  const handleViewPayslip = (payslip: any) => {
+    setCurrentPayslip(payslip);
+    toast({
+      title: "Viewing Payslip",
+      description: `Viewing payslip for ${payslip.month}`
+    });
+  };
+
+  const handleDownloadPayslip = (payslip: any) => {
+    // This would be an actual download in a real app
+    toast({
+      title: "Download Started",
+      description: `Downloading payslip for ${payslip.month}`
+    });
+  };
 
   return (
     <EmployeeDashboardLayout>
@@ -61,50 +111,65 @@ const PayslipsPage = () => {
             <CardTitle>Payslip History</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="rounded-md border">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead>
-                  <tr>
-                    <th scope="col" className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Month
-                    </th>
-                    <th scope="col" className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Amount
-                    </th>
-                    <th scope="col" className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Payment Date
-                    </th>
-                    <th scope="col" className="px-6 py-3 bg-gray-50 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {payslips.map((payslip) => (
-                    <tr key={payslip.id}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 flex items-center">
-                        <FileText className="h-5 w-5 text-gray-400 mr-2" />
-                        {payslip.month}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {payslip.amount}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {payslip.date}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <Button variant="ghost" size="sm" className="mr-2">
-                          <Eye className="h-4 w-4 mr-1" /> View
-                        </Button>
-                        <Button variant="ghost" size="sm">
-                          <Download className="h-4 w-4 mr-1" /> Download
-                        </Button>
-                      </td>
+            {isLoading ? (
+              <div className="py-8 text-center">
+                <p>Loading payslips...</p>
+              </div>
+            ) : (
+              <div className="rounded-md border">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead>
+                    <tr>
+                      <th scope="col" className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Month
+                      </th>
+                      <th scope="col" className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Amount
+                      </th>
+                      <th scope="col" className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Payment Date
+                      </th>
+                      <th scope="col" className="px-6 py-3 bg-gray-50 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Actions
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {payslips.map((payslip) => (
+                      <tr key={payslip.id}>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 flex items-center">
+                          <FileText className="h-5 w-5 text-gray-400 mr-2" />
+                          {payslip.month}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {payslip.amount}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {payslip.date}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="mr-2"
+                            onClick={() => handleViewPayslip(payslip)}
+                          >
+                            <Eye className="h-4 w-4 mr-1" /> View
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => handleDownloadPayslip(payslip)}
+                          >
+                            <Download className="h-4 w-4 mr-1" /> Download
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
