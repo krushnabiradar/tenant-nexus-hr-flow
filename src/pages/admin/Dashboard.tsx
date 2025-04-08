@@ -6,7 +6,7 @@ import StatsCard from "@/components/dashboard/widgets/StatsCard";
 import RecentCompanies from "@/components/dashboard/widgets/RecentCompanies";
 import SystemActivity from "@/components/dashboard/widgets/SystemActivity";
 import PerformanceChart from "@/components/dashboard/widgets/PerformanceChart";
-import { api } from "@/services/api";
+import api from "@/services/api";
 import { useToast } from "@/hooks/use-toast";
 
 const AdminDashboard = () => {
