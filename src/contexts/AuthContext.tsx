@@ -5,7 +5,7 @@ import { authAPI } from "@/services/api";
 // Define types for user and context
 type User = {
   email: string;
-  role: string;
+  role: "admin" | "company" | "employee" | "manager" | "finance" | "compliance" | "recruitment";
   name?: string;
   tenantId?: string;
   isAuthenticated: boolean;

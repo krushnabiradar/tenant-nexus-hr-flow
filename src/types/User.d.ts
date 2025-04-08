@@ -6,7 +6,7 @@ interface User {
   name: string;
   email: string;
   password?: string;
-  role: 'SuperAdmin' | 'HR' | 'Manager' | 'Employee';
+  role: 'admin' | 'company' | 'employee' | 'manager' | 'finance' | 'compliance' | 'recruitment';
   permissions: string[];
   employeeProfile?: string | Employee;
   status: 'Active' | 'Inactive';

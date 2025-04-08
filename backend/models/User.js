@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Tenant',
     required: function() {
-      return this.role !== 'SuperAdmin';
+      return this.role !== 'admin';
     },
     index: true
   },
@@ -28,7 +28,7 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['SuperAdmin', 'HR', 'Manager', 'Employee'],
+    enum: ['admin', 'company', 'employee', 'manager', 'finance', 'compliance', 'recruitment'],
     required: true
   },
   permissions: {

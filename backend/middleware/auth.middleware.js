@@ -36,6 +36,14 @@ const isCompany = (req, res, next) => {
   next();
 };
 
+// Middleware to check manager role
+const isManager = (req, res, next) => {
+  if (req.userRole !== 'manager' && req.userRole !== 'company' && req.userRole !== 'admin') {
+    return res.status(403).json({ message: 'Access denied: Manager role required' });
+  }
+  next();
+};
+
 // Middleware to check multiple allowed roles
 const checkRoles = (roles) => {
   return (req, res, next) => {
@@ -52,5 +60,6 @@ module.exports = {
   verifyToken,
   isAdmin,
   isCompany,
+  isManager,
   checkRoles
 };
