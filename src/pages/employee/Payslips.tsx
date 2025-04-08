@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CreditCard, Download, Eye, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { format } from "date-fns";
+import { employeeApi } from "@/services/employee.api";
 
 const PayslipsPage = () => {
   const [payslips, setPayslips] = useState<any[]>([]);
@@ -13,15 +13,24 @@ const PayslipsPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  // TODO: Replace with actual API call when available
   useEffect(() => {
     const fetchPayslips = async () => {
       setIsLoading(true);
       try {
-        // This would be replaced with an actual API call
-        // Example: const response = await payrollAPI.getEmployeePayslips(userId);
+        const response = await employeeApi.getPayslips();
+        setPayslips(response.payslips || []);
+        if (response.payslips && response.payslips.length > 0) {
+          setCurrentPayslip(response.payslips[0]);
+        }
+      } catch (error) {
+        console.error("Error fetching payslips:", error);
+        toast({
+          title: "Error",
+          description: "Failed to fetch payroll data",
+          variant: "destructive"
+        });
         
-        // Mock data until payroll API is available
+        // Use mock data as fallback if API is not ready
         const mockPayslips = [
           { id: 1, month: "March 2025", amount: "$4,850.00", date: "April 1, 2025" },
           { id: 2, month: "February 2025", amount: "$4,850.00", date: "March 1, 2025" },
@@ -33,13 +42,6 @@ const PayslipsPage = () => {
         
         setPayslips(mockPayslips);
         setCurrentPayslip(mockPayslips[0]);
-      } catch (error) {
-        console.error("Error fetching payslips:", error);
-        toast({
-          title: "Error",
-          description: "Failed to fetch payroll data",
-          variant: "destructive"
-        });
       } finally {
         setIsLoading(false);
       }
@@ -57,7 +59,7 @@ const PayslipsPage = () => {
   };
 
   const handleDownloadPayslip = (payslip: any) => {
-    // This would be an actual download in a real app
+    // This would be an actual download request in a real app
     toast({
       title: "Download Started",
       description: `Downloading payslip for ${payslip.month}`
@@ -80,26 +82,28 @@ const PayslipsPage = () => {
                   <CreditCard className="h-8 w-8 text-purple-600" />
                 </div>
                 <div className="text-center">
-                  <h3 className="text-3xl font-bold mb-1">$4,850.00</h3>
+                  <h3 className="text-3xl font-bold mb-1">
+                    {currentPayslip?.totalSalary || currentPayslip?.amount || "$4,850.00"}
+                  </h3>
                   <p className="text-sm text-gray-500">Monthly Net Salary</p>
                 </div>
               </div>
               <div className="lg:w-2/3 grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="p-4 bg-gray-50 rounded-lg">
                   <p className="text-sm text-gray-500 mb-1">Basic Salary</p>
-                  <p className="text-xl font-semibold">$4,000.00</p>
+                  <p className="text-xl font-semibold">{currentPayslip?.basicSalary || "$4,000.00"}</p>
                 </div>
                 <div className="p-4 bg-gray-50 rounded-lg">
                   <p className="text-sm text-gray-500 mb-1">Housing Allowance</p>
-                  <p className="text-xl font-semibold">$800.00</p>
+                  <p className="text-xl font-semibold">{currentPayslip?.housingAllowance || "$800.00"}</p>
                 </div>
                 <div className="p-4 bg-gray-50 rounded-lg">
                   <p className="text-sm text-gray-500 mb-1">Transportation Allowance</p>
-                  <p className="text-xl font-semibold">$200.00</p>
+                  <p className="text-xl font-semibold">{currentPayslip?.transportAllowance || "$200.00"}</p>
                 </div>
                 <div className="p-4 bg-gray-50 rounded-lg">
                   <p className="text-sm text-gray-500 mb-1">Tax Deductions</p>
-                  <p className="text-xl font-semibold">-$150.00</p>
+                  <p className="text-xl font-semibold">{currentPayslip?.taxDeductions || "-$150.00"}</p>
                 </div>
               </div>
             </div>
@@ -142,7 +146,7 @@ const PayslipsPage = () => {
                           {payslip.month}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {payslip.amount}
+                          {payslip.amount || payslip.totalSalary}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {payslip.date}

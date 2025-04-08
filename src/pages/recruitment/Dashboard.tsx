@@ -1,9 +1,68 @@
 
+import { useState, useEffect } from "react";
 import RecruitmentDashboardLayout from "@/layouts/RecruitmentDashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Briefcase, Users, CalendarCheck, ClipboardList } from "lucide-react";
+import { recruitmentApi } from "@/services/recruitment.api";
+import { useToast } from "@/hooks/use-toast";
 
 const RecruitmentDashboard = () => {
+  const [dashboardData, setDashboardData] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        setIsLoading(true);
+        const data = await recruitmentApi.getDashboardData();
+        setDashboardData(data);
+      } catch (error) {
+        console.error("Failed to fetch recruitment dashboard data:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load dashboard data. Please try again later.",
+          variant: "destructive"
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, [toast]);
+
+  if (isLoading) {
+    return (
+      <RecruitmentDashboardLayout>
+        <div className="flex items-center justify-center h-96">
+          <p className="text-lg text-gray-500">Loading dashboard data...</p>
+        </div>
+      </RecruitmentDashboardLayout>
+    );
+  }
+
+  const stats = dashboardData?.stats || {
+    openPositions: { value: "24", change: "+2 from last month" },
+    activeCandidates: { value: "142", change: "+18 new this week" },
+    interviews: { value: "38", change: "6 today" },
+    onboarding: { value: "12", change: "4 pending completion" }
+  };
+
+  const recentApplications = dashboardData?.recentApplications || [
+    { name: "Sarah Johnson", position: "UX Designer", department: "Design", date: "Today" },
+    { name: "Michael Chen", position: "Frontend Developer", department: "Engineering", date: "Yesterday" },
+    { name: "Priya Patel", position: "Product Manager", department: "Product", date: "2 days ago" },
+    { name: "David Wilson", position: "DevOps Engineer", department: "Engineering", date: "3 days ago" },
+  ];
+
+  const upcomingInterviews = dashboardData?.upcomingInterviews || [
+    { name: "Jessica Lee", position: "Marketing Specialist", time: "Today, 10:00 AM", interviewer: "Mark Thompson" },
+    { name: "Robert Brown", position: "Backend Developer", time: "Today, 2:30 PM", interviewer: "Emma Davis" },
+    { name: "Nina Rodriguez", position: "HR Manager", time: "Tomorrow, 11:00 AM", interviewer: "Alex Wright" },
+    { name: "James Kim", position: "Financial Analyst", time: "Tomorrow, 3:00 PM", interviewer: "Sophia Chen" },
+  ];
+
   return (
     <RecruitmentDashboardLayout>
       <div className="space-y-6">
@@ -28,8 +87,8 @@ const RecruitmentDashboard = () => {
               <Briefcase className="h-4 w-4 text-purple-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">24</div>
-              <p className="text-xs text-muted-foreground">+2 from last month</p>
+              <div className="text-2xl font-bold">{stats.openPositions.value}</div>
+              <p className="text-xs text-muted-foreground">{stats.openPositions.change}</p>
             </CardContent>
           </Card>
           
@@ -39,8 +98,8 @@ const RecruitmentDashboard = () => {
               <Users className="h-4 w-4 text-blue-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">142</div>
-              <p className="text-xs text-muted-foreground">+18 new this week</p>
+              <div className="text-2xl font-bold">{stats.activeCandidates.value}</div>
+              <p className="text-xs text-muted-foreground">{stats.activeCandidates.change}</p>
             </CardContent>
           </Card>
           
@@ -50,8 +109,8 @@ const RecruitmentDashboard = () => {
               <CalendarCheck className="h-4 w-4 text-green-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">38</div>
-              <p className="text-xs text-muted-foreground">6 today</p>
+              <div className="text-2xl font-bold">{stats.interviews.value}</div>
+              <p className="text-xs text-muted-foreground">{stats.interviews.change}</p>
             </CardContent>
           </Card>
           
@@ -61,8 +120,8 @@ const RecruitmentDashboard = () => {
               <ClipboardList className="h-4 w-4 text-orange-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">12</div>
-              <p className="text-xs text-muted-foreground">4 pending completion</p>
+              <div className="text-2xl font-bold">{stats.onboarding.value}</div>
+              <p className="text-xs text-muted-foreground">{stats.onboarding.change}</p>
             </CardContent>
           </Card>
         </div>
@@ -74,12 +133,7 @@ const RecruitmentDashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {[
-                  { name: "Sarah Johnson", position: "UX Designer", department: "Design", date: "Today" },
-                  { name: "Michael Chen", position: "Frontend Developer", department: "Engineering", date: "Yesterday" },
-                  { name: "Priya Patel", position: "Product Manager", department: "Product", date: "2 days ago" },
-                  { name: "David Wilson", position: "DevOps Engineer", department: "Engineering", date: "3 days ago" },
-                ].map((item, index) => (
+                {recentApplications.map((item, index) => (
                   <div key={index} className="flex items-center justify-between p-3 border border-gray-100 rounded-md bg-gray-50">
                     <div>
                       <p className="font-medium">{item.name}</p>
@@ -98,12 +152,7 @@ const RecruitmentDashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {[
-                  { name: "Jessica Lee", position: "Marketing Specialist", time: "Today, 10:00 AM", interviewer: "Mark Thompson" },
-                  { name: "Robert Brown", position: "Backend Developer", time: "Today, 2:30 PM", interviewer: "Emma Davis" },
-                  { name: "Nina Rodriguez", position: "HR Manager", time: "Tomorrow, 11:00 AM", interviewer: "Alex Wright" },
-                  { name: "James Kim", position: "Financial Analyst", time: "Tomorrow, 3:00 PM", interviewer: "Sophia Chen" },
-                ].map((item, index) => (
+                {upcomingInterviews.map((item, index) => (
                   <div key={index} className="flex items-center justify-between p-3 border border-gray-100 rounded-md bg-gray-50">
                     <div>
                       <p className="font-medium">{item.name}</p>

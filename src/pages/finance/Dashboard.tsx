@@ -1,15 +1,61 @@
 
+import { useState, useEffect } from "react";
 import FinanceDashboardLayout from "@/layouts/FinanceDashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Banknote, TrendingUp, CreditCard, Users } from "lucide-react";
+import { financeApi } from "@/services/finance.api";
+import { useToast } from "@/hooks/use-toast";
 
 const FinanceDashboard = () => {
+  const [dashboardData, setDashboardData] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        setIsLoading(true);
+        const data = await financeApi.getDashboardData();
+        setDashboardData(data);
+      } catch (error) {
+        console.error("Failed to fetch finance dashboard data:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load dashboard data. Please try again later.",
+          variant: "destructive"
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, [toast]);
+
+  if (isLoading) {
+    return (
+      <FinanceDashboardLayout>
+        <div className="flex items-center justify-center h-96">
+          <p className="text-lg text-gray-500">Loading dashboard data...</p>
+        </div>
+      </FinanceDashboardLayout>
+    );
+  }
+
+  const stats = dashboardData?.stats || {
+    totalPayroll: { value: "$128,450", change: "+5.5% from last month" },
+    taxWithholdings: { value: "$42,350", change: "+2.1% from last month" },
+    pendingReimbursements: { value: "$8,750", info: "12 requests pending" },
+    activeEmployees: { value: "236", change: "+4 this month" },
+    fiscalPeriod: "Q2 2025"
+  };
+
   return (
     <FinanceDashboardLayout>
       <div className="space-y-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between">
           <h2 className="text-2xl font-bold tracking-tight">Finance Dashboard</h2>
-          <p className="text-muted-foreground">Fiscal Period: Q2 2025</p>
+          <p className="text-muted-foreground">Fiscal Period: {stats.fiscalPeriod}</p>
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -19,8 +65,8 @@ const FinanceDashboard = () => {
               <Banknote className="h-4 w-4 text-emerald-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">$128,450</div>
-              <p className="text-xs text-muted-foreground">+5.5% from last month</p>
+              <div className="text-2xl font-bold">{stats.totalPayroll.value}</div>
+              <p className="text-xs text-muted-foreground">{stats.totalPayroll.change}</p>
             </CardContent>
           </Card>
           <Card>
@@ -29,8 +75,8 @@ const FinanceDashboard = () => {
               <TrendingUp className="h-4 w-4 text-emerald-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">$42,350</div>
-              <p className="text-xs text-muted-foreground">+2.1% from last month</p>
+              <div className="text-2xl font-bold">{stats.taxWithholdings.value}</div>
+              <p className="text-xs text-muted-foreground">{stats.taxWithholdings.change}</p>
             </CardContent>
           </Card>
           <Card>
@@ -39,8 +85,8 @@ const FinanceDashboard = () => {
               <CreditCard className="h-4 w-4 text-emerald-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">$8,750</div>
-              <p className="text-xs text-muted-foreground">12 requests pending</p>
+              <div className="text-2xl font-bold">{stats.pendingReimbursements.value}</div>
+              <p className="text-xs text-muted-foreground">{stats.pendingReimbursements.info}</p>
             </CardContent>
           </Card>
           <Card>
@@ -49,8 +95,8 @@ const FinanceDashboard = () => {
               <Users className="h-4 w-4 text-emerald-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">236</div>
-              <p className="text-xs text-muted-foreground">+4 this month</p>
+              <div className="text-2xl font-bold">{stats.activeEmployees.value}</div>
+              <p className="text-xs text-muted-foreground">{stats.activeEmployees.change}</p>
             </CardContent>
           </Card>
         </div>
